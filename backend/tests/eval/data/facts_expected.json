@@ -1,0 +1,49 @@
+{
+  "_note": "Hand-verified ground truth. Values checked against the visible text of the live Groww pages. Update only after re-checking the live page (docs/eval.md §9).",
+  "_verified_on": "2026-11-07",
+  "hdfc-mid-cap": {
+    "expense_ratio": "0.74%",
+    "exit_load": "Exit load of 1% if redeemed within 1 year.",
+    "min_sip": "₹100",
+    "min_lumpsum": "₹100",
+    "benchmark": "NIFTY Midcap 150 Total Return Index",
+    "riskometer": "Very High",
+    "fund_manager": "Chirag Setalvad (since 01 Jan 2013), Dhruv Muchhal (since 22 Jun 2023)"
+  },
+  "hdfc-small-cap": {
+    "expense_ratio": "0.79%",
+    "exit_load": "Exit load of 1% if redeemed within 1 year",
+    "min_sip": "₹100",
+    "min_lumpsum": "₹100",
+    "benchmark": "BSE 250 SmallCap Total Return Index",
+    "riskometer": "Very High",
+    "fund_manager": "Dhruv Muchhal (since 22 Jun 2023), Chirag Setalvad (since 28 Jun 2014)"
+  },
+  "hdfc-large-cap": {
+    "expense_ratio": "1.01%",
+    "exit_load": "Exit load of 1% if redeemed within 1 year",
+    "min_sip": "₹100",
+    "min_lumpsum": "₹100",
+    "benchmark": "NIFTY 100 Total Return Index",
+    "riskometer": "Very High",
+    "fund_manager": "Rahul Baijal (since 29 Jul 2022), Dhruv Muchhal (since 22 Jun 2023)"
+  },
+  "hdfc-silver-etf-fof": {
+    "expense_ratio": "0.21%",
+    "exit_load": "Exit load of 1%, if redeemed within 15 days.",
+    "min_sip": "₹100",
+    "min_lumpsum": "₹100",
+    "benchmark": "Domestic Price of Silver",
+    "riskometer": "Very High",
+    "fund_manager": "Arun Agarwal (since 15 Feb 2023), Nandita Menezes (since 29 Mar 2025)"
+  },
+  "hdfc-multi-cap": {
+    "expense_ratio": "0.96%",
+    "exit_load": "Exit load of 1% if redeemed within 1 year.",
+    "min_sip": "₹100",
+    "min_lumpsum": "₹100",
+    "benchmark": "Nifty 500 Multicap 50:25:25 Total Return Index",
+    "riskometer": "Very High",
+    "fund_manager": "Amar Kalkundrikar (since 01 Sep 2025), Dhruv Muchhal (since 22 Jun 2023)"
+  }
+}

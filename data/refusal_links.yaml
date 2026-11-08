@@ -1,0 +1,14 @@
+# Educational links shown in refusal messages (problemStatement §4.3), and as the single
+# link on other non-answer replies (greeting, clarify, out of scope) when no scheme page
+# applies. These are not fetched, indexed or used to answer questions.
+# Checked HTTP 200 on 2026-11-07.
+
+amfi_investor_education:
+  url: https://www.amfiindia.com/investor
+  label: AMFI investor education
+  used_for: [advice, comparison]
+
+sebi_investor_education:
+  url: https://investor.sebi.gov.in/
+  label: SEBI investor website
+  used_for: [prediction]

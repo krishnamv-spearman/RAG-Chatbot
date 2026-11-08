@@ -1,0 +1,232 @@
+{
+  "hdfc-mid-cap": {
+    "name": "HDFC Mid Cap Fund Direct Growth",
+    "source_id": "groww-hdfc-mid-cap",
+    "url": "https://groww.in/mutual-funds/hdfc-mid-cap-fund-direct-growth",
+    "doc_date": "2026-11-06",
+    "facts": {
+      "expense_ratio": {
+        "value": "0.74%",
+        "as_on": "2026-11-04",
+        "source_chunk_id": "groww-hdfc-mid-cap#expense_ratio"
+      },
+      "exit_load": {
+        "value": "Exit load of 1% if redeemed within 1 year.",
+        "as_on": null,
+        "source_chunk_id": "groww-hdfc-mid-cap#exit_load"
+      },
+      "min_sip": {
+        "value": "₹100",
+        "as_on": null,
+        "source_chunk_id": "groww-hdfc-mid-cap#min_sip"
+      },
+      "min_lumpsum": {
+        "value": "₹100",
+        "as_on": null,
+        "source_chunk_id": "groww-hdfc-mid-cap#min_lumpsum"
+      },
+      "benchmark": {
+        "value": "NIFTY Midcap 150 Total Return Index",
+        "as_on": null,
+        "source_chunk_id": "groww-hdfc-mid-cap#benchmark"
+      },
+      "riskometer": {
+        "value": "Very High",
+        "as_on": null,
+        "source_chunk_id": "groww-hdfc-mid-cap#riskometer"
+      },
+      "fund_manager": {
+        "value": "Chirag Setalvad (since 01 Jan 2013), Dhruv Muchhal (since 22 Jun 2023)",
+        "as_on": null,
+        "source_chunk_id": "groww-hdfc-mid-cap#fund_manager"
+      }
+    },
+    "missing": [
+      "lock_in"
+    ]
+  },
+  "hdfc-small-cap": {
+    "name": "HDFC Small Cap Fund Direct Growth",
+    "source_id": "groww-hdfc-small-cap",
+    "url": "https://groww.in/mutual-funds/hdfc-small-cap-fund-direct-growth",
+    "doc_date": "2026-11-06",
+    "facts": {
+      "expense_ratio": {
+        "value": "0.79%",
+        "as_on": "2026-11-04",
+        "source_chunk_id": "groww-hdfc-small-cap#expense_ratio"
+      },
+      "exit_load": {
+        "value": "Exit load of 1% if redeemed within 1 year",
+        "as_on": null,
+        "source_chunk_id": "groww-hdfc-small-cap#exit_load"
+      },
+      "min_sip": {
+        "value": "₹100",
+        "as_on": null,
+        "source_chunk_id": "groww-hdfc-small-cap#min_sip"
+      },
+      "min_lumpsum": {
+        "value": "₹100",
+        "as_on": null,
+        "source_chunk_id": "groww-hdfc-small-cap#min_lumpsum"
+      },
+      "benchmark": {
+        "value": "BSE 250 SmallCap Total Return Index",
+        "as_on": null,
+        "source_chunk_id": "groww-hdfc-small-cap#benchmark"
+      },
+      "riskometer": {
+        "value": "Very High",
+        "as_on": null,
+        "source_chunk_id": "groww-hdfc-small-cap#riskometer"
+      },
+      "fund_manager": {
+        "value": "Dhruv Muchhal (since 22 Jun 2023), Chirag Setalvad (since 28 Jun 2014)",
+        "as_on": null,
+        "source_chunk_id": "groww-hdfc-small-cap#fund_manager"
+      }
+    },
+    "missing": [
+      "lock_in"
+    ]
+  },
+  "hdfc-large-cap": {
+    "name": "HDFC Large Cap Fund Direct Growth",
+    "source_id": "groww-hdfc-large-cap",
+    "url": "https://groww.in/mutual-funds/hdfc-large-cap-fund-direct-growth",
+    "doc_date": "2026-11-06",
+    "facts": {
+      "expense_ratio": {
+        "value": "1.01%",
+        "as_on": "2026-11-04",
+        "source_chunk_id": "groww-hdfc-large-cap#expense_ratio"
+      },
+      "exit_load": {
+        "value": "Exit load of 1% if redeemed within 1 year",
+        "as_on": null,
+        "source_chunk_id": "groww-hdfc-large-cap#exit_load"
+      },
+      "min_sip": {
+        "value": "₹100",
+        "as_on": null,
+        "source_chunk_id": "groww-hdfc-large-cap#min_sip"
+      },
+      "min_lumpsum": {
+        "value": "₹100",
+        "as_on": null,
+        "source_chunk_id": "groww-hdfc-large-cap#min_lumpsum"
+      },
+      "benchmark": {
+        "value": "NIFTY 100 Total Return Index",
+        "as_on": null,
+        "source_chunk_id": "groww-hdfc-large-cap#benchmark"
+      },
+      "riskometer": {
+        "value": "Very High",
+        "as_on": null,
+        "source_chunk_id": "groww-hdfc-large-cap#riskometer"
+      },
+      "fund_manager": {
+        "value": "Rahul Baijal (since 29 Jul 2022), Dhruv Muchhal (since 22 Jun 2023)",
+        "as_on": null,
+        "source_chunk_id": "groww-hdfc-large-cap#fund_manager"
+      }
+    },
+    "missing": [
+      "lock_in"
+    ]
+  },
+  "hdfc-silver-etf-fof": {
+    "name": "HDFC Silver ETF FoF Direct Growth",
+    "source_id": "groww-hdfc-silver-etf-fof",
+    "url": "https://groww.in/mutual-funds/hdfc-silver-etf-fof-direct-growth",
+    "doc_date": "2026-11-06",
+    "facts": {
+      "expense_ratio": {
+        "value": "0.21%",
+        "as_on": "2026-11-04",
+        "source_chunk_id": "groww-hdfc-silver-etf-fof#expense_ratio"
+      },
+      "exit_load": {
+        "value": "Exit load of 1%, if redeemed within 15 days.",
+        "as_on": null,
+        "source_chunk_id": "groww-hdfc-silver-etf-fof#exit_load"
+      },
+      "min_sip": {
+        "value": "₹100",
+        "as_on": null,
+        "source_chunk_id": "groww-hdfc-silver-etf-fof#min_sip"
+      },
+      "min_lumpsum": {
+        "value": "₹100",
+        "as_on": null,
+        "source_chunk_id": "groww-hdfc-silver-etf-fof#min_lumpsum"
+      },
+      "benchmark": {
+        "value": "Domestic Price of Silver",
+        "as_on": null,
+        "source_chunk_id": "groww-hdfc-silver-etf-fof#benchmark"
+      },
+      "riskometer": {
+        "value": "Very High",
+        "as_on": null,
+        "source_chunk_id": "groww-hdfc-silver-etf-fof#riskometer"
+      },
+      "fund_manager": {
+        "value": "Arun Agarwal (since 15 Feb 2023), Nandita Menezes (since 29 Mar 2025)",
+        "as_on": null,
+        "source_chunk_id": "groww-hdfc-silver-etf-fof#fund_manager"
+      }
+    },
+    "missing": [
+      "lock_in"
+    ]
+  },
+  "hdfc-multi-cap": {
+    "name": "HDFC Multi Cap Fund Direct Growth",
+    "source_id": "groww-hdfc-multi-cap",
+    "url": "https://groww.in/mutual-funds/hdfc-multi-cap-fund-direct-growth",
+    "doc_date": "2026-11-06",
+    "facts": {
+      "expense_ratio": {
+        "value": "0.96%",
+        "as_on": "2026-11-04",
+        "source_chunk_id": "groww-hdfc-multi-cap#expense_ratio"
+      },
+      "exit_load": {
+        "value": "Exit load of 1% if redeemed within 1 year.",
+        "as_on": null,
+        "source_chunk_id": "groww-hdfc-multi-cap#exit_load"
+      },
+      "min_sip": {
+        "value": "₹100",
+        "as_on": null,
+        "source_chunk_id": "groww-hdfc-multi-cap#min_sip"
+      },
+      "min_lumpsum": {
+        "value": "₹100",
+        "as_on": null,
+        "source_chunk_id": "groww-hdfc-multi-cap#min_lumpsum"
+      },
+      "benchmark": {
+        "value": "Nifty 500 Multicap 50:25:25 Total Return Index",
+        "as_on": null,
+        "source_chunk_id": "groww-hdfc-multi-cap#benchmark"
+      },
+      "riskometer": {
+        "value": "Very High",
+        "as_on": null,
+        "source_chunk_id": "groww-hdfc-multi-cap#riskometer"
+      },
+      "fund_manager": {
+        "value": "Amar Kalkundrikar (since 01 Sep 2025), Dhruv Muchhal (since 22 Jun 2023)",
+        "as_on": null,
+        "source_chunk_id": "groww-hdfc-multi-cap#fund_manager"
+      }
+    },
+    "missing": [
+      "lock_in"
+    ]
+  }
+}

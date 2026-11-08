@@ -1,0 +1,28 @@
+# Canonical scheme IDs, display names and the ways users refer to them.
+# Aliases are matched case-insensitively. Include spaced / hyphenated / joined variants.
+# Plan/option covered by the corpus: Direct plan, Growth option only.
+
+hdfc-mid-cap:
+  name: HDFC Mid Cap Fund
+  source_id: groww-hdfc-mid-cap
+  aliases: [mid cap, mid-cap, midcap, hdfc mid cap, mid cap opportunities, mid-cap opportunities]
+
+hdfc-small-cap:
+  name: HDFC Small Cap Fund
+  source_id: groww-hdfc-small-cap
+  aliases: [small cap, small-cap, smallcap, hdfc small cap]
+
+hdfc-large-cap:
+  name: HDFC Large Cap Fund
+  source_id: groww-hdfc-large-cap
+  aliases: [large cap, large-cap, largecap, hdfc large cap, top 100, hdfc top 100]
+
+hdfc-silver-etf-fof:
+  name: HDFC Silver ETF FoF
+  source_id: groww-hdfc-silver-etf-fof
+  aliases: [silver, silver etf, silver fof, silver etf fof, silver fund of fund, silver fund of funds]
+
+hdfc-multi-cap:
+  name: HDFC Multi Cap Fund
+  source_id: groww-hdfc-multi-cap
+  aliases: [multi cap, multi-cap, multicap, hdfc multi cap]

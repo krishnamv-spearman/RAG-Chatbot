@@ -1,0 +1,101 @@
+{"text": "my PAN is ABCDE1234F, what's my capital gain?", "expected": ["pan"]}
+{"text": "PAN: BNZPM2501F", "expected": ["pan"]}
+{"text": "pan abcde1234f please check", "expected": ["pan"]}
+{"text": "ABCDE 1234 F is my pan", "expected": ["pan"]}
+{"text": "Here is AAAPL1234C for KYC", "expected": ["pan"]}
+{"text": "My pan card number is ZXCVB9876Q", "expected": ["pan"]}
+{"text": "pan-ABCPE1234K", "expected": ["pan"]}
+{"text": "kyc done with pan qwert5678y", "expected": ["pan"]}
+{"text": "PAN=FGHIJ0001Z, folio pending", "expected": ["pan"]}
+{"text": "update my PAN (LMNOP4321A) on the fund", "expected": ["pan"]}
+{"text": "my aadhaar is 2345 6789 0124", "expected": ["aadhaar"]}
+{"text": "aadhaar 987654321096", "expected": ["aadhaar"]}
+{"text": "UID 4561-2378-9011 linked?", "expected": ["aadhaar"]}
+{"text": "Aadhaar no: 3000 1234 5679", "expected": ["aadhaar"]}
+{"text": "876543210988 is my aadhar", "expected": ["aadhaar"]}
+{"text": "link 5647 3829 1015 to my folio please", "expected": ["aadhaar"]}
+{"text": "aadhaar 2345-6789-0124", "expected": ["aadhaar"]}
+{"text": "my uid is 456123789011", "expected": ["aadhaar"]}
+{"text": "Aadhaar card: 9876 5432 1096.", "expected": ["aadhaar"]}
+{"text": "(3000-1234-5679) is the number", "expected": ["aadhaar"]}
+{"text": "call me on 9876543210", "expected": ["phone"]}
+{"text": "my number is +91 98765 43210", "expected": ["phone"]}
+{"text": "whatsapp 09876543210", "expected": ["phone"]}
+{"text": "ping 91-7012345678", "expected": ["phone"]}
+{"text": "contact: 8123 456 789", "expected": ["phone"]}
+{"text": "phone 6000012345 for callback", "expected": ["phone"]}
+{"text": "+917654321098 is mine", "expected": ["phone"]}
+{"text": "reach me at 98200-12345", "expected": ["phone"]}
+{"text": "mobile no 9123456780 linked to folio?", "expected": ["phone"]}
+{"text": "my registered mobile is 7 0 1 2 3 4 5 6 7 8", "expected": ["phone"], "note": "digit-by-digit spacing"}
+{"text": "mail me at a@b.com", "expected": ["email"]}
+{"text": "my email is rahul.sharma@gmail.com", "expected": ["email"]}
+{"text": "send statement to investor_01@yahoo.co.in", "expected": ["email"]}
+{"text": "x.y+mf@outlook.com is registered", "expected": ["email"]}
+{"text": "Email: someone@company.org", "expected": ["email"]}
+{"text": "contact first.last@sub.domain.in", "expected": ["email"]}
+{"text": "is TEST@EXAMPLE.COM registered?", "expected": ["email"]}
+{"text": "my id a_b@c.io", "expected": ["email"]}
+{"text": "forward to me@me.net please", "expected": ["email"]}
+{"text": "hello@groww.in sent me a mail", "expected": ["email"]}
+{"text": "OTP is 482913, it's not working", "expected": ["otp"]}
+{"text": "my otp 1234", "expected": ["otp"]}
+{"text": "I got OTP: 556677 on sms", "expected": ["otp"]}
+{"text": "482913 is the otp", "expected": ["otp"]}
+{"text": "one time password 99887766", "expected": ["otp"]}
+{"text": "verification code 4321 failed", "expected": ["otp"]}
+{"text": "one-time-password - 765432", "expected": ["otp"]}
+{"text": "security code 8080", "expected": ["otp"]}
+{"text": "my pin is 4455", "expected": ["otp"]}
+{"text": "authentication code 112233 expired", "expected": ["otp"]}
+{"text": "folio 1234567890 statement", "expected": ["account"]}
+{"text": "my folio number is 98765432", "expected": ["account"]}
+{"text": "Folio no. 556677", "expected": ["account"]}
+{"text": "account number 123456789012", "expected": ["account"]}
+{"text": "bank a/c 50100123456789", "expected": ["account"]}
+{"text": "acct no: 0012345678901", "expected": ["account"]}
+{"text": "demat account 1203320000123456", "expected": ["account"]}
+{"text": "folio#11223344 not showing", "expected": ["account"]}
+{"text": "account: 987654321 linked", "expected": ["account"]}
+{"text": "folio 7766554 SIP failed", "expected": ["account"]}
+{"text": "PAN ABCDE1234F and mail a@b.com", "expected": ["email", "pan"]}
+{"text": "call 9876543210 or mail x@y.com", "expected": ["email", "phone"]}
+{"text": "What is the expense ratio of HDFC Mid Cap Fund?", "expected": []}
+{"text": "₹500 SIP in small cap", "expected": []}
+{"text": "1,00,000 lump sum in HDFC Large Cap", "expected": []}
+{"text": "Is the expense ratio 0.74%?", "expected": []}
+{"text": "I invested 100000000000 rupees", "expected": [], "note": "12 digits but fails Verhoeff (PII-04)"}
+{"text": "invested 234567890125", "expected": [], "note": "Aadhaar format, checksum invalid"}
+{"text": "how do I change my email in the folio?", "expected": [], "note": "PII-08: word only"}
+{"text": "I live in pin 560001", "expected": [], "note": "PII-10 pin code exclusion: 'pin' + 6 digits is a postal code here"}
+{"text": "my pincode is 560001", "expected": []}
+{"text": "pin code 400001 area branch", "expected": []}
+{"text": "What is the ISIN INF179K01XQ0?", "expected": [], "note": "ISIN is public"}
+{"text": "scheme code 118989 details", "expected": [], "note": "bare 'code' is not an OTP keyword"}
+{"text": "NAV was 226.045 on 06 Nov 2026", "expected": []}
+{"text": "AUM is ₹1,01,856.06 Cr", "expected": []}
+{"text": "exit load 1% within 365 days", "expected": []}
+{"text": "minimum SIP 100 and lumpsum 5000", "expected": []}
+{"text": "launched on 01-Jan-2013", "expected": []}
+{"text": "HDFC Mid Cap Fund Direct Growth", "expected": []}
+{"text": "benchmark NIFTY Midcap 150 TRI", "expected": []}
+{"text": "what is the account opening process?", "expected": []}
+{"text": "my folio shows wrong NAV", "expected": []}
+{"text": "stamp duty 0.005% from July 1st, 2020", "expected": []}
+{"text": "I am 25 years old with 10000 per month", "expected": []}
+{"text": "invest 25000 every month for 10 years", "expected": []}
+{"text": "Nifty 500 Multicap 50:25:25 index", "expected": []}
+{"text": "top holdings 9.79% ICICI Bank", "expected": []}
+{"text": "SIP date 5th, amount 2500", "expected": []}
+{"text": "price 1257.172 per unit", "expected": []}
+{"text": "year 2026 2025 2024 returns", "expected": []}
+{"text": "OTP problems? how do I log in", "expected": [], "note": "keyword without digits"}
+{"text": "my account was debited twice", "expected": []}
+{"text": "invested 50000 in 2023 into my account", "expected": [], "note": "digits before 'account' and < 9 digits"}
+{"text": "the email address field is empty", "expected": []}
+{"text": "contact HDFC MF at their website", "expected": []}
+{"text": "ratio 0.21% and NAV ₹30.14", "expected": []}
+{"text": "my phone number changed, how do I update it?", "expected": []}
+{"text": "Is there a lock-in of 3 years?", "expected": []}
+{"text": "₹9,876 SIP each month", "expected": [], "note": "comma-grouped amount is not a phone"}
+{"text": "HDFCB1234X fund code", "expected": ["pan"], "note": "PAN-shaped string is treated as PAN (accepted false positive)"}

@@ -1,0 +1,36 @@
+# The complete corpus: exactly these 5 Groww scheme pages (implementation-plan.md, Phase 1).
+# Do not add other URLs. Every answer cites one of these.
+#
+# render: auto  -> plain HTTP first; fall back to a headless browser only if key content is missing
+#         http  -> plain HTTP only
+#         js    -> always use the headless browser
+
+- id: groww-hdfc-mid-cap
+  url: https://groww.in/mutual-funds/hdfc-mid-cap-fund-direct-growth
+  scheme: hdfc-mid-cap
+  source_type: groww_scheme_page
+  render: auto
+
+- id: groww-hdfc-small-cap
+  url: https://groww.in/mutual-funds/hdfc-small-cap-fund-direct-growth
+  scheme: hdfc-small-cap
+  source_type: groww_scheme_page
+  render: auto
+
+- id: groww-hdfc-large-cap
+  url: https://groww.in/mutual-funds/hdfc-large-cap-fund-direct-growth
+  scheme: hdfc-large-cap
+  source_type: groww_scheme_page
+  render: auto
+
+- id: groww-hdfc-silver-etf-fof
+  url: https://groww.in/mutual-funds/hdfc-silver-etf-fof-direct-growth
+  scheme: hdfc-silver-etf-fof
+  source_type: groww_scheme_page
+  render: auto
+
+- id: groww-hdfc-multi-cap
+  url: https://groww.in/mutual-funds/hdfc-multi-cap-fund-direct-growth
+  scheme: hdfc-multi-cap
+  source_type: groww_scheme_page
+  render: auto

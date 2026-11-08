@@ -1,0 +1,23 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      # Tests use ChromaDB + BM25 (rag) and the fetcher (ingest); the embedding model
+      # itself is faked in tests, so no model download is needed. The web UI (frontend/)
+      # has no build step; test_api.py checks the backend serves it.
+      - run: pip install -e ".[dev,ingest,rag]"
+      - run: ruff check .
+      - run: pytest

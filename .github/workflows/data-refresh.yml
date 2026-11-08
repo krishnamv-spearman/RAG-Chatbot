@@ -1,0 +1,164 @@
+# Daily data refresh (implementation-plan.md, Phase 7).
+#
+# Every day at 10:00 IST: fetch the 5 Groww pages -> normalise -> parse -> quality gates ->
+# chunk -> embed -> store a NEW index version in the shared ChromaDB -> retrieval eval on
+# that version -> make it live -> prune old versions. The running app picks the new
+# version up within INDEX_REFRESH_SECONDS, without a restart.
+#
+# If any step fails, the previous version stays live and a GitHub issue is opened.
+# No LLM calls: the Groq budget isn't used.
+#
+# Required repository secrets (Settings -> Secrets and variables -> Actions):
+#   Chroma Cloud:        CHROMA_API_KEY, CHROMA_TENANT, CHROMA_DATABASE
+#   or self-hosted:      CHROMA_HOST, CHROMA_PORT (default 443), CHROMA_SSL (default true),
+#                        CHROMA_AUTH_TOKEN (optional)
+#
+# Manual run: Actions -> "Daily data refresh" -> Run workflow (optionally roll back to an
+# earlier version, or force a new version).
+
+name: Daily data refresh
+
+on:
+  schedule:
+    - cron: "30 4 * * *"  # 04:30 UTC = 10:00 IST. GitHub may start scheduled runs a little late.
+  workflow_dispatch:
+    inputs:
+      rollback_to:
+        description: "Re-activate this earlier index version instead of refreshing (leave empty to refresh)"
+        required: false
+        default: ""
+      force:
+        description: "Build a new version even if nothing changed"
+        type: boolean
+        default: false
+
+concurrency:
+  group: data-refresh
+  cancel-in-progress: false  # never interrupt a run that is switching versions
+
+permissions:
+  contents: read
+  issues: write
+
+env:
+  VECTOR_STORE: chroma_remote
+  CHROMA_API_KEY: ${{ secrets.CHROMA_API_KEY }}
+  CHROMA_TENANT: ${{ secrets.CHROMA_TENANT }}
+  CHROMA_DATABASE: ${{ secrets.CHROMA_DATABASE }}
+  CHROMA_HOST: ${{ secrets.CHROMA_HOST }}
+  # Unset secrets become empty strings; give number/boolean settings safe defaults.
+  CHROMA_PORT: ${{ secrets.CHROMA_PORT || '443' }}
+  CHROMA_SSL: ${{ secrets.CHROMA_SSL || 'true' }}
+  CHROMA_AUTH_TOKEN: ${{ secrets.CHROMA_AUTH_TOKEN }}
+  HF_HUB_DISABLE_PROGRESS_BARS: "1"
+  TOKENIZERS_PARALLELISM: "false"
+  PYTHONUTF8: "1"
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/pyproject.toml
+
+      - name: Cache the embedding model
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-${{ runner.os }}-bge-small-en-v1.5
+
+      - name: Install
+        run: pip install -e ".[ingest,rag]"
+
+      - name: Check the ChromaDB secrets are set
+        run: |
+          if [ -z "$CHROMA_API_KEY" ] && [ -z "$CHROMA_HOST" ]; then
+            echo "::error::Set CHROMA_API_KEY (Chroma Cloud) or CHROMA_HOST (self-hosted) in the repository secrets."
+            exit 1
+          fi
+
+      # ---------------------------------------------------------------- rollback only
+      - name: Roll back to an earlier version
+        if: ${{ inputs.rollback_to }}
+        env:
+          ROLLBACK_TO: ${{ inputs.rollback_to }}
+        run: python -m app.ingest --activate "$ROLLBACK_TO" --summary "$GITHUB_STEP_SUMMARY"
+
+      # ---------------------------------------------------------------- refresh
+      - name: Stage a new version (fetch, normalise, parse, gates, chunk, embed, store)
+        id: stage
+        if: ${{ !inputs.rollback_to }}
+        continue-on-error: true  # retried below with browser rendering
+        env:
+          FORCE_FLAG: ${{ inputs.force && '--force' || '' }}
+        run: python -m app.ingest --stage --report --summary "$GITHUB_STEP_SUMMARY" $FORCE_FLAG
+
+      - name: Retry with browser rendering (pages that need JavaScript)
+        id: retry
+        if: ${{ !inputs.rollback_to && steps.stage.outcome == 'failure' }}
+        env:
+          FORCE_FLAG: ${{ inputs.force && '--force' || '' }}
+        run: |
+          python -m playwright install --with-deps chromium
+          python -m app.ingest --stage --report --summary "$GITHUB_STEP_SUMMARY" $FORCE_FLAG
+
+      - name: Pick the staged version
+        id: staged
+        if: ${{ !inputs.rollback_to }}
+        run: |
+          echo "version=${{ steps.stage.outputs.version || steps.retry.outputs.version }}" >> "$GITHUB_OUTPUT"
+          echo "changed=${{ steps.stage.outputs.changed || steps.retry.outputs.changed }}" >> "$GITHUB_OUTPUT"
+
+      - name: Quality gate - retrieval eval on the staged version
+        if: ${{ steps.staged.outputs.changed == 'true' }}
+        env:
+          VERSION: ${{ steps.staged.outputs.version }}
+        run: python -m tests.eval.retrieval_eval --version "$VERSION"
+
+      - name: Make the new version live
+        if: ${{ steps.staged.outputs.changed == 'true' }}
+        env:
+          VERSION: ${{ steps.staged.outputs.version }}
+        run: python -m app.ingest --activate "$VERSION" --summary "$GITHUB_STEP_SUMMARY"
+
+      - name: Delete old versions (keep the live one + 2 for rollback)
+        if: ${{ !inputs.rollback_to }}
+        run: python -m app.ingest --prune --keep 3 --summary "$GITHUB_STEP_SUMMARY"
+
+      # ---------------------------------------------------------------- audit & alerts
+      - name: Upload snapshots, parsed data and eval results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: data-refresh-${{ github.run_id }}
+          retention-days: 14
+          if-no-files-found: ignore
+          path: |
+            data/raw/
+            data/parsed/
+            data/facts.json
+            backend/tests/eval/results/
+
+      - name: Open or update a GitHub issue on failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          body="The daily data refresh on $(date -u +%F) failed. The previous index version is still live. Details: $RUN_URL"
+          gh label create data-refresh --color B60205 --description "Daily data refresh" --force >/dev/null 2>&1 || true
+          existing=$(gh issue list --state open --label data-refresh --json number --jq '.[0].number')
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
+          else
+            gh issue create --title "Daily data refresh failed" --label data-refresh --body "$body"
+          fi

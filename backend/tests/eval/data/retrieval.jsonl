@@ -1,0 +1,50 @@
+{"id": "R-01", "question": "What is the expense ratio of HDFC Mid Cap Fund?", "scheme": "hdfc-mid-cap", "relevant": ["groww-hdfc-mid-cap#expense_ratio"], "in_scope": true, "tags": ["expense_ratio"]}
+{"id": "R-02", "question": "expense ratio of small cap", "scheme": "hdfc-small-cap", "relevant": ["groww-hdfc-small-cap#expense_ratio"], "in_scope": true, "tags": ["expense_ratio"]}
+{"id": "R-03", "question": "What is the TER of HDFC Large Cap?", "scheme": "hdfc-large-cap", "relevant": ["groww-hdfc-large-cap#expense_ratio"], "in_scope": true, "tags": ["expense_ratio", "synonym"]}
+{"id": "R-04", "question": "How much are the fees for the silver fund of fund?", "scheme": "hdfc-silver-etf-fof", "relevant": ["groww-hdfc-silver-etf-fof#expense_ratio"], "in_scope": true, "tags": ["expense_ratio", "synonym"]}
+{"id": "R-05", "question": "Exit load of HDFC Multi Cap Fund", "scheme": "hdfc-multi-cap", "relevant": ["groww-hdfc-multi-cap#exit_load"], "in_scope": true, "tags": ["exit_load"]}
+{"id": "R-06", "question": "Is there any charge if I redeem HDFC Silver ETF FoF early?", "scheme": "hdfc-silver-etf-fof", "relevant": ["groww-hdfc-silver-etf-fof#exit_load"], "in_scope": true, "tags": ["exit_load", "synonym"]}
+{"id": "R-07", "question": "redemption charge for mid cap", "scheme": "hdfc-mid-cap", "relevant": ["groww-hdfc-mid-cap#exit_load"], "in_scope": true, "tags": ["exit_load", "synonym"]}
+{"id": "R-08", "question": "What is the minimum SIP amount for HDFC Small Cap?", "scheme": "hdfc-small-cap", "relevant": ["groww-hdfc-small-cap#min_sip"], "in_scope": true, "tags": ["min_sip"]}
+{"id": "R-09", "question": "Minimum monthly SIP for multi cap", "scheme": "hdfc-multi-cap", "relevant": ["groww-hdfc-multi-cap#min_sip"], "in_scope": true, "tags": ["min_sip"]}
+{"id": "R-10", "question": "min SIP large cap", "scheme": "hdfc-large-cap", "relevant": ["groww-hdfc-large-cap#min_sip"], "in_scope": true, "tags": ["min_sip"]}
+{"id": "R-11", "question": "Minimum lump sum investment in HDFC Mid Cap", "scheme": "hdfc-mid-cap", "relevant": ["groww-hdfc-mid-cap#min_lumpsum"], "in_scope": true, "tags": ["min_lumpsum"]}
+{"id": "R-12", "question": "one-time minimum investment silver", "scheme": "hdfc-silver-etf-fof", "relevant": ["groww-hdfc-silver-etf-fof#min_lumpsum"], "in_scope": true, "tags": ["min_lumpsum", "synonym"]}
+{"id": "R-13", "question": "What is the benchmark of HDFC Large Cap Fund?", "scheme": "hdfc-large-cap", "relevant": ["groww-hdfc-large-cap#benchmark"], "in_scope": true, "tags": ["benchmark"]}
+{"id": "R-14", "question": "Which index does HDFC Small Cap track?", "scheme": "hdfc-small-cap", "relevant": ["groww-hdfc-small-cap#benchmark"], "in_scope": true, "tags": ["benchmark", "synonym"]}
+{"id": "R-15", "question": "benchmark of silver etf fof", "scheme": "hdfc-silver-etf-fof", "relevant": ["groww-hdfc-silver-etf-fof#benchmark"], "in_scope": true, "tags": ["benchmark"]}
+{"id": "R-16", "question": "Riskometer of HDFC Mid Cap Fund", "scheme": "hdfc-mid-cap", "relevant": ["groww-hdfc-mid-cap#riskometer"], "in_scope": true, "tags": ["riskometer"]}
+{"id": "R-17", "question": "What is the risk level of HDFC Multi Cap?", "scheme": "hdfc-multi-cap", "relevant": ["groww-hdfc-multi-cap#riskometer"], "in_scope": true, "tags": ["riskometer", "synonym"]}
+{"id": "R-18", "question": "how risky is the large cap fund as per riskometer", "scheme": "hdfc-large-cap", "relevant": ["groww-hdfc-large-cap#riskometer"], "in_scope": true, "tags": ["riskometer"]}
+{"id": "R-19", "question": "Who manages HDFC Small Cap Fund?", "scheme": "hdfc-small-cap", "relevant": ["groww-hdfc-small-cap#fund_manager"], "in_scope": true, "tags": ["fund_manager", "synonym"]}
+{"id": "R-20", "question": "fund manager of silver fof", "scheme": "hdfc-silver-etf-fof", "relevant": ["groww-hdfc-silver-etf-fof#fund_manager"], "in_scope": true, "tags": ["fund_manager"]}
+{"id": "R-21", "question": "What is the AUM of HDFC Mid Cap?", "scheme": "hdfc-mid-cap", "relevant": ["groww-hdfc-mid-cap#aum"], "in_scope": true, "tags": ["aum"]}
+{"id": "R-22", "question": "fund size of multi cap", "scheme": "hdfc-multi-cap", "relevant": ["groww-hdfc-multi-cap#aum"], "in_scope": true, "tags": ["aum", "synonym"]}
+{"id": "R-23", "question": "NAV of HDFC Large Cap Fund", "scheme": "hdfc-large-cap", "relevant": ["groww-hdfc-large-cap#nav"], "in_scope": true, "tags": ["nav"]}
+{"id": "R-24", "question": "Top holdings of HDFC Small Cap Fund", "scheme": "hdfc-small-cap", "relevant": ["groww-hdfc-small-cap#top_holdings"], "in_scope": true, "tags": ["top_holdings"]}
+{"id": "R-25", "question": "what stocks does mid cap hold", "scheme": "hdfc-mid-cap", "relevant": ["groww-hdfc-mid-cap#top_holdings"], "in_scope": true, "tags": ["top_holdings", "synonym"]}
+{"id": "R-26", "question": "Launch date of HDFC Multi Cap Fund", "scheme": "hdfc-multi-cap", "relevant": ["groww-hdfc-multi-cap#launch_date"], "in_scope": true, "tags": ["launch_date"]}
+{"id": "R-27", "question": "When was the silver ETF FoF launched?", "scheme": "hdfc-silver-etf-fof", "relevant": ["groww-hdfc-silver-etf-fof#launch_date"], "in_scope": true, "tags": ["launch_date"]}
+{"id": "R-28", "question": "ISIN of HDFC Mid Cap Fund Direct Growth", "scheme": "hdfc-mid-cap", "relevant": ["groww-hdfc-mid-cap#isin"], "in_scope": true, "tags": ["isin"]}
+{"id": "R-29", "question": "Who is the registrar of HDFC Large Cap?", "scheme": "hdfc-large-cap", "relevant": ["groww-hdfc-large-cap#registrar"], "in_scope": true, "tags": ["registrar"]}
+{"id": "R-30", "question": "stamp duty on HDFC Small Cap", "scheme": "hdfc-small-cap", "relevant": ["groww-hdfc-small-cap#stamp_duty"], "in_scope": true, "tags": ["stamp_duty"]}
+{"id": "R-31", "question": "investment objective of multi cap", "scheme": "hdfc-multi-cap", "relevant": ["groww-hdfc-multi-cap#objective"], "in_scope": true, "tags": ["objective"]}
+{"id": "R-32", "question": "What does HDFC Silver ETF FoF invest in?", "scheme": "hdfc-silver-etf-fof", "relevant": ["groww-hdfc-silver-etf-fof#objective", "groww-hdfc-silver-etf-fof#top_holdings"], "in_scope": true, "tags": ["objective"]}
+{"id": "R-33", "question": "Which category is HDFC Mid Cap in?", "scheme": "hdfc-mid-cap", "relevant": ["groww-hdfc-mid-cap#category"], "in_scope": true, "tags": ["category"]}
+{"id": "R-34", "question": "Is this the direct plan or regular plan of large cap?", "scheme": "hdfc-large-cap", "relevant": ["groww-hdfc-large-cap#plan"], "in_scope": true, "tags": ["plan"]}
+{"id": "R-35", "question": "minimum additional investment small cap", "scheme": "hdfc-small-cap", "relevant": ["groww-hdfc-small-cap#min_additional_investment"], "in_scope": true, "tags": ["min_additional_investment"]}
+{"id": "R-36", "question": "HDFC Mid Cap exit load", "scheme": null, "relevant": ["groww-hdfc-mid-cap#exit_load"], "in_scope": true, "tags": ["exit_load", "no_scheme"]}
+{"id": "R-37", "question": "expense ratio of HDFC Silver ETF FoF", "scheme": null, "relevant": ["groww-hdfc-silver-etf-fof#expense_ratio"], "in_scope": true, "tags": ["expense_ratio", "no_scheme"]}
+{"id": "R-38", "question": "benchmark of HDFC Multi Cap Fund", "scheme": null, "relevant": ["groww-hdfc-multi-cap#benchmark"], "in_scope": true, "tags": ["benchmark", "no_scheme"]}
+{"id": "R-39", "question": "HDFC Small Cap fund manager", "scheme": null, "relevant": ["groww-hdfc-small-cap#fund_manager"], "in_scope": true, "tags": ["fund_manager", "no_scheme"]}
+{"id": "R-40", "question": "riskometer HDFC Large Cap", "scheme": null, "relevant": ["groww-hdfc-large-cap#riskometer"], "in_scope": true, "tags": ["riskometer", "no_scheme"]}
+{"id": "R-41", "question": "What is the capital of France?", "scheme": null, "relevant": [], "in_scope": false, "tags": ["off_domain"]}
+{"id": "R-42", "question": "Write me a poem about the ocean", "scheme": null, "relevant": [], "in_scope": false, "tags": ["off_domain"]}
+{"id": "R-43", "question": "How do I reset my Groww app password?", "scheme": null, "relevant": [], "in_scope": false, "tags": ["off_domain"]}
+{"id": "R-44", "question": "What is the weather in Mumbai today?", "scheme": null, "relevant": [], "in_scope": false, "tags": ["off_domain"]}
+{"id": "R-45", "question": "Explain quantum computing in simple terms", "scheme": null, "relevant": [], "in_scope": false, "tags": ["off_domain"]}
+{"id": "R-46", "question": "Who won the cricket world cup?", "scheme": null, "relevant": [], "in_scope": false, "tags": ["off_domain"]}
+{"id": "R-47", "question": "Recipe for paneer butter masala", "scheme": null, "relevant": [], "in_scope": false, "tags": ["off_domain"]}
+{"id": "R-48", "question": "How do I download my capital gains statement?", "scheme": null, "relevant": [], "in_scope": false, "tags": ["not_in_corpus"]}
+{"id": "R-49", "question": "What is the ELSS lock-in period?", "scheme": null, "relevant": [], "in_scope": false, "tags": ["not_in_corpus"]}
+{"id": "R-50", "question": "How is tax calculated when I redeem?", "scheme": null, "relevant": [], "in_scope": false, "tags": ["not_in_corpus"]}

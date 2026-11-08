@@ -1,0 +1,23 @@
+{"id": "P3-01", "question": "What is the expense ratio of HDFC Mid Cap Fund?", "scheme": "hdfc-mid-cap", "expected_kind": "answer", "fact": "expense_ratio"}
+{"id": "P3-02", "question": "What is the exit load of HDFC Mid Cap Fund?", "scheme": "hdfc-mid-cap", "expected_kind": "answer", "fact": "exit_load"}
+{"id": "P3-03", "question": "Which benchmark does HDFC Mid Cap Fund follow?", "scheme": "hdfc-mid-cap", "expected_kind": "answer", "fact": "benchmark"}
+{"id": "P3-04", "question": "What is the minimum SIP amount for HDFC Mid Cap Fund?", "scheme": "hdfc-mid-cap", "expected_kind": "answer", "fact": "min_sip"}
+{"id": "P3-05", "question": "What is the TER of HDFC Small Cap Fund?", "scheme": "hdfc-small-cap", "expected_kind": "answer", "fact": "expense_ratio"}
+{"id": "P3-06", "question": "Is there a charge if I redeem HDFC Small Cap early?", "scheme": "hdfc-small-cap", "expected_kind": "answer", "fact": "exit_load"}
+{"id": "P3-07", "question": "What index is HDFC Small Cap benchmarked against?", "scheme": "hdfc-small-cap", "expected_kind": "answer", "fact": "benchmark"}
+{"id": "P3-08", "question": "What is the riskometer level of HDFC Small Cap Fund?", "scheme": "hdfc-small-cap", "expected_kind": "answer", "fact": "riskometer"}
+{"id": "P3-09", "question": "Expense ratio of HDFC Large Cap Fund?", "scheme": "hdfc-large-cap", "expected_kind": "answer", "fact": "expense_ratio"}
+{"id": "P3-10", "question": "What exit load applies to HDFC Large Cap Fund?", "scheme": "hdfc-large-cap", "expected_kind": "answer", "fact": "exit_load"}
+{"id": "P3-11", "question": "What is the benchmark of HDFC Large Cap?", "scheme": "hdfc-large-cap", "expected_kind": "answer", "fact": "benchmark"}
+{"id": "P3-12", "question": "Who manages HDFC Large Cap Fund?", "scheme": "hdfc-large-cap", "expected_kind": "answer", "fact": "fund_manager"}
+{"id": "P3-13", "question": "How much is the expense ratio of the HDFC Silver ETF FoF?", "scheme": "hdfc-silver-etf-fof", "expected_kind": "answer", "fact": "expense_ratio"}
+{"id": "P3-14", "question": "What is the exit load on HDFC Silver ETF FoF?", "scheme": "hdfc-silver-etf-fof", "expected_kind": "answer", "fact": "exit_load"}
+{"id": "P3-15", "question": "What is the benchmark of the silver fund of fund?", "scheme": "hdfc-silver-etf-fof", "expected_kind": "answer", "fact": "benchmark"}
+{"id": "P3-16", "question": "Minimum one-time investment for HDFC Silver ETF FoF?", "scheme": "hdfc-silver-etf-fof", "expected_kind": "answer", "fact": "min_lumpsum"}
+{"id": "P3-17", "question": "What is the expense ratio of HDFC Multi Cap Fund?", "scheme": "hdfc-multi-cap", "expected_kind": "answer", "fact": "expense_ratio"}
+{"id": "P3-18", "question": "Exit load for HDFC Multi Cap?", "scheme": "hdfc-multi-cap", "expected_kind": "answer", "fact": "exit_load"}
+{"id": "P3-19", "question": "Which index does HDFC Multi Cap Fund use as benchmark?", "scheme": "hdfc-multi-cap", "expected_kind": "answer", "fact": "benchmark"}
+{"id": "P3-20", "question": "Who are the fund managers of HDFC Multi Cap Fund?", "scheme": "hdfc-multi-cap", "expected_kind": "answer", "fact": "fund_manager"}
+{"id": "P3-21", "question": "What is the ELSS lock-in period?", "scheme": null, "expected_kind": "not_found", "fact": null}
+{"id": "P3-22", "question": "How do I download my capital gains statement?", "scheme": null, "expected_kind": "not_found", "fact": null}
+{"id": "P3-23", "question": "Who is the auditor of HDFC Mid Cap Fund?", "scheme": "hdfc-mid-cap", "expected_kind": "not_found", "fact": null}

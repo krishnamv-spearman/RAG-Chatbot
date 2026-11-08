@@ -1,0 +1,724 @@
+{
+  "summary": {
+    "date": "2026-11-07",
+    "passed": 23,
+    "total": 23,
+    "factual_passed": 20,
+    "factual_total": 20,
+    "llm_calls": 22,
+    "latency_ms_p50": 726,
+    "latency_ms_max": 5556
+  },
+  "rows": [
+    {
+      "id": "P3-01",
+      "ok": true,
+      "kind": "answer",
+      "text": "The expense ratio of HDFC Mid Cap Fund Direct Growth is 0.74% (as on 04 Nov 2026).",
+      "source_url": "https://groww.in/mutual-funds/hdfc-mid-cap-fund-direct-growth",
+      "footer": "Last updated from sources: 06 Nov 2026",
+      "problems": [],
+      "debug": {
+        "scheme": "hdfc-mid-cap",
+        "best_similarity": 0.901,
+        "retrieved": [
+          "groww-hdfc-mid-cap#expense_ratio",
+          "groww-hdfc-mid-cap#riskometer",
+          "groww-hdfc-mid-cap#min_lumpsum",
+          "groww-hdfc-mid-cap#min_sip",
+          "groww-hdfc-mid-cap#isin"
+        ],
+        "ranking_query": "what is the expense ratio of",
+        "llm_calls": 1,
+        "prompt_tokens": 727,
+        "completion_tokens": 87,
+        "llm_latency_ms": 702,
+        "validation": {
+          "action": "accept",
+          "issues": [],
+          "fixes": []
+        },
+        "latency_ms": 761
+      }
+    },
+    {
+      "id": "P3-02",
+      "ok": true,
+      "kind": "answer",
+      "text": "HDFC Mid Cap Fund Direct Growth has an exit load of 1% if redeemed within 1 year.",
+      "source_url": "https://groww.in/mutual-funds/hdfc-mid-cap-fund-direct-growth",
+      "footer": "Last updated from sources: 06 Nov 2026",
+      "problems": [],
+      "debug": {
+        "scheme": "hdfc-mid-cap",
+        "best_similarity": 0.901,
+        "retrieved": [
+          "groww-hdfc-mid-cap#exit_load",
+          "groww-hdfc-mid-cap#stamp_duty",
+          "groww-hdfc-mid-cap#riskometer",
+          "groww-hdfc-mid-cap#plan",
+          "groww-hdfc-mid-cap#category"
+        ],
+        "ranking_query": "what is the exit load of",
+        "llm_calls": 1,
+        "prompt_tokens": 722,
+        "completion_tokens": 88,
+        "llm_latency_ms": 304,
+        "validation": {
+          "action": "accept",
+          "issues": [],
+          "fixes": []
+        },
+        "latency_ms": 337
+      }
+    },
+    {
+      "id": "P3-03",
+      "ok": true,
+      "kind": "answer",
+      "text": "HDFC Mid Cap Fund Direct Growth follows the NIFTY Midcap 150 Total Return Index as its benchmark.",
+      "source_url": "https://groww.in/mutual-funds/hdfc-mid-cap-fund-direct-growth",
+      "footer": "Last updated from sources: 06 Nov 2026",
+      "problems": [],
+      "debug": {
+        "scheme": "hdfc-mid-cap",
+        "best_similarity": 0.864,
+        "retrieved": [
+          "groww-hdfc-mid-cap#benchmark",
+          "groww-hdfc-mid-cap#riskometer",
+          "groww-hdfc-mid-cap#top_holdings",
+          "groww-hdfc-mid-cap#exit_load",
+          "groww-hdfc-mid-cap#category"
+        ],
+        "ranking_query": "which benchmark does follow",
+        "llm_calls": 1,
+        "prompt_tokens": 818,
+        "completion_tokens": 79,
+        "llm_latency_ms": 401,
+        "validation": {
+          "action": "accept",
+          "issues": [],
+          "fixes": []
+        },
+        "latency_ms": 433
+      }
+    },
+    {
+      "id": "P3-04",
+      "ok": true,
+      "kind": "answer",
+      "text": "The minimum SIP amount for HDFC Mid Cap Fund Direct Growth is ₹100.",
+      "source_url": "https://groww.in/mutual-funds/hdfc-mid-cap-fund-direct-growth",
+      "footer": "Last updated from sources: 06 Nov 2026",
+      "problems": [],
+      "debug": {
+        "scheme": "hdfc-mid-cap",
+        "best_similarity": 0.934,
+        "retrieved": [
+          "groww-hdfc-mid-cap#min_sip",
+          "groww-hdfc-mid-cap#min_additional_investment",
+          "groww-hdfc-mid-cap#min_lumpsum",
+          "groww-hdfc-mid-cap#stamp_duty",
+          "groww-hdfc-mid-cap#aum"
+        ],
+        "ranking_query": "what is the minimum sip amount for",
+        "llm_calls": 1,
+        "prompt_tokens": 753,
+        "completion_tokens": 78,
+        "llm_latency_ms": 583,
+        "validation": {
+          "action": "accept",
+          "issues": [],
+          "fixes": []
+        },
+        "latency_ms": 620
+      }
+    },
+    {
+      "id": "P3-05",
+      "ok": true,
+      "kind": "answer",
+      "text": "The TER (expense ratio) of HDFC Small Cap Fund Direct Growth is 0.79% (as on 04 Nov 2026).",
+      "source_url": "https://groww.in/mutual-funds/hdfc-small-cap-fund-direct-growth",
+      "footer": "Last updated from sources: 06 Nov 2026",
+      "problems": [],
+      "debug": {
+        "scheme": "hdfc-small-cap",
+        "best_similarity": 0.828,
+        "retrieved": [
+          "groww-hdfc-small-cap#expense_ratio",
+          "groww-hdfc-small-cap#category",
+          "groww-hdfc-small-cap#riskometer",
+          "groww-hdfc-small-cap#registrar",
+          "groww-hdfc-small-cap#isin"
+        ],
+        "ranking_query": "what is the ter of",
+        "llm_calls": 1,
+        "prompt_tokens": 716,
+        "completion_tokens": 109,
+        "llm_latency_ms": 603,
+        "validation": {
+          "action": "accept",
+          "issues": [],
+          "fixes": []
+        },
+        "latency_ms": 639
+      }
+    },
+    {
+      "id": "P3-06",
+      "ok": true,
+      "kind": "answer",
+      "text": "HDFC Small Cap Fund Direct Growth has an exit load of 1% if redeemed within 1 year.",
+      "source_url": "https://groww.in/mutual-funds/hdfc-small-cap-fund-direct-growth",
+      "footer": "Last updated from sources: 06 Nov 2026",
+      "problems": [],
+      "debug": {
+        "scheme": "hdfc-small-cap",
+        "best_similarity": 0.749,
+        "retrieved": [
+          "groww-hdfc-small-cap#exit_load",
+          "groww-hdfc-small-cap#stamp_duty",
+          "groww-hdfc-small-cap#min_sip",
+          "groww-hdfc-small-cap#nav",
+          "groww-hdfc-small-cap#expense_ratio"
+        ],
+        "ranking_query": "is there a charge if i redeem early",
+        "llm_calls": 1,
+        "prompt_tokens": 744,
+        "completion_tokens": 87,
+        "llm_latency_ms": 689,
+        "validation": {
+          "action": "accept",
+          "issues": [],
+          "fixes": []
+        },
+        "latency_ms": 726
+      }
+    },
+    {
+      "id": "P3-07",
+      "ok": true,
+      "kind": "answer",
+      "text": "HDFC Small Cap Fund Direct Growth is benchmarked against the BSE 250 SmallCap Total Return Index.",
+      "source_url": "https://groww.in/mutual-funds/hdfc-small-cap-fund-direct-growth",
+      "footer": "Last updated from sources: 06 Nov 2026",
+      "problems": [],
+      "debug": {
+        "scheme": "hdfc-small-cap",
+        "best_similarity": 0.901,
+        "retrieved": [
+          "groww-hdfc-small-cap#benchmark",
+          "groww-hdfc-small-cap#riskometer",
+          "groww-hdfc-small-cap#top_holdings",
+          "groww-hdfc-small-cap#isin",
+          "groww-hdfc-small-cap#category"
+        ],
+        "ranking_query": "what index is benchmarked against",
+        "llm_calls": 1,
+        "prompt_tokens": 814,
+        "completion_tokens": 98,
+        "llm_latency_ms": 701,
+        "validation": {
+          "action": "accept",
+          "issues": [],
+          "fixes": []
+        },
+        "latency_ms": 736
+      }
+    },
+    {
+      "id": "P3-08",
+      "ok": true,
+      "kind": "answer",
+      "text": "HDFC Small Cap Fund Direct Growth has a Very High riskometer classification.",
+      "source_url": "https://groww.in/mutual-funds/hdfc-small-cap-fund-direct-growth",
+      "footer": "Last updated from sources: 06 Nov 2026",
+      "problems": [],
+      "debug": {
+        "scheme": "hdfc-small-cap",
+        "best_similarity": 0.87,
+        "retrieved": [
+          "groww-hdfc-small-cap#riskometer",
+          "groww-hdfc-small-cap#benchmark",
+          "groww-hdfc-small-cap#stamp_duty",
+          "groww-hdfc-small-cap#expense_ratio",
+          "groww-hdfc-small-cap#category"
+        ],
+        "ranking_query": "what is the riskometer level of",
+        "llm_calls": 1,
+        "prompt_tokens": 730,
+        "completion_tokens": 94,
+        "llm_latency_ms": 639,
+        "validation": {
+          "action": "accept",
+          "issues": [],
+          "fixes": []
+        },
+        "latency_ms": 672
+      }
+    },
+    {
+      "id": "P3-09",
+      "ok": true,
+      "kind": "answer",
+      "text": "HDFC Large Cap Fund Direct Growth has an expense ratio of 1.01% (as on 04 Nov 2026).",
+      "source_url": "https://groww.in/mutual-funds/hdfc-large-cap-fund-direct-growth",
+      "footer": "Last updated from sources: 06 Nov 2026",
+      "problems": [],
+      "debug": {
+        "scheme": "hdfc-large-cap",
+        "best_similarity": 0.894,
+        "retrieved": [
+          "groww-hdfc-large-cap#expense_ratio",
+          "groww-hdfc-large-cap#riskometer",
+          "groww-hdfc-large-cap#min_lumpsum",
+          "groww-hdfc-large-cap#min_sip",
+          "groww-hdfc-large-cap#stamp_duty"
+        ],
+        "ranking_query": "expense ratio of",
+        "llm_calls": 1,
+        "prompt_tokens": 734,
+        "completion_tokens": 89,
+        "llm_latency_ms": 412,
+        "validation": {
+          "action": "accept",
+          "issues": [],
+          "fixes": []
+        },
+        "latency_ms": 448
+      }
+    },
+    {
+      "id": "P3-10",
+      "ok": true,
+      "kind": "answer",
+      "text": "HDFC Large Cap Fund Direct Growth has an exit load of 1% if redeemed within 1 year.",
+      "source_url": "https://groww.in/mutual-funds/hdfc-large-cap-fund-direct-growth",
+      "footer": "Last updated from sources: 06 Nov 2026",
+      "problems": [],
+      "debug": {
+        "scheme": "hdfc-large-cap",
+        "best_similarity": 0.898,
+        "retrieved": [
+          "groww-hdfc-large-cap#exit_load",
+          "groww-hdfc-large-cap#stamp_duty",
+          "groww-hdfc-large-cap#plan",
+          "groww-hdfc-large-cap#riskometer",
+          "groww-hdfc-large-cap#category"
+        ],
+        "ranking_query": "what exit load applies to",
+        "llm_calls": 1,
+        "prompt_tokens": 721,
+        "completion_tokens": 88,
+        "llm_latency_ms": 438,
+        "validation": {
+          "action": "accept",
+          "issues": [],
+          "fixes": []
+        },
+        "latency_ms": 471
+      }
+    },
+    {
+      "id": "P3-11",
+      "ok": true,
+      "kind": "answer",
+      "text": "HDFC Large Cap Fund Direct Growth benchmark index is NIFTY 100 Total Return Index.",
+      "source_url": "https://groww.in/mutual-funds/hdfc-large-cap-fund-direct-growth",
+      "footer": "Last updated from sources: 06 Nov 2026",
+      "problems": [],
+      "debug": {
+        "scheme": "hdfc-large-cap",
+        "best_similarity": 0.82,
+        "retrieved": [
+          "groww-hdfc-large-cap#benchmark",
+          "groww-hdfc-large-cap#riskometer",
+          "groww-hdfc-large-cap#expense_ratio",
+          "groww-hdfc-large-cap#exit_load",
+          "groww-hdfc-large-cap#category"
+        ],
+        "ranking_query": "what is the benchmark of",
+        "llm_calls": 1,
+        "prompt_tokens": 721,
+        "completion_tokens": 118,
+        "llm_latency_ms": 686,
+        "validation": {
+          "action": "accept",
+          "issues": [],
+          "fixes": []
+        },
+        "latency_ms": 718
+      }
+    },
+    {
+      "id": "P3-12",
+      "ok": true,
+      "kind": "answer",
+      "text": "HDFC Large Cap Fund Direct Growth is managed by Rahul Baijal (since 29 Jul 2022) and Dhruv Muchhal (since 22 Jun 2023).",
+      "source_url": "https://groww.in/mutual-funds/hdfc-large-cap-fund-direct-growth",
+      "footer": "Last updated from sources: 06 Nov 2026",
+      "problems": [],
+      "debug": {
+        "scheme": "hdfc-large-cap",
+        "best_similarity": 0.855,
+        "retrieved": [
+          "groww-hdfc-large-cap#fund_manager",
+          "groww-hdfc-large-cap#riskometer",
+          "groww-hdfc-large-cap#isin",
+          "groww-hdfc-large-cap#registrar",
+          "groww-hdfc-large-cap#category"
+        ],
+        "ranking_query": "who manages",
+        "llm_calls": 1,
+        "prompt_tokens": 723,
+        "completion_tokens": 154,
+        "llm_latency_ms": 842,
+        "validation": {
+          "action": "accept",
+          "issues": [],
+          "fixes": []
+        },
+        "latency_ms": 875
+      }
+    },
+    {
+      "id": "P3-13",
+      "ok": true,
+      "kind": "answer",
+      "text": "The expense ratio of HDFC Silver ETF FoF Direct Growth is 0.21% (as on 04 Nov 2026).",
+      "source_url": "https://groww.in/mutual-funds/hdfc-silver-etf-fof-direct-growth",
+      "footer": "Last updated from sources: 06 Nov 2026",
+      "problems": [],
+      "debug": {
+        "scheme": "hdfc-silver-etf-fof",
+        "best_similarity": 0.914,
+        "retrieved": [
+          "groww-hdfc-silver-etf-fof#expense_ratio",
+          "groww-hdfc-silver-etf-fof#min_sip",
+          "groww-hdfc-silver-etf-fof#min_lumpsum",
+          "groww-hdfc-silver-etf-fof#riskometer",
+          "groww-hdfc-silver-etf-fof#min_additional_investment"
+        ],
+        "ranking_query": "how much is the expense ratio of the",
+        "llm_calls": 1,
+        "prompt_tokens": 767,
+        "completion_tokens": 95,
+        "llm_latency_ms": 629,
+        "validation": {
+          "action": "accept",
+          "issues": [],
+          "fixes": []
+        },
+        "latency_ms": 666
+      }
+    },
+    {
+      "id": "P3-14",
+      "ok": true,
+      "kind": "answer",
+      "text": "The exit load on HDFC Silver ETF FoF Direct Growth is 1% if redeemed within 15 days.",
+      "source_url": "https://groww.in/mutual-funds/hdfc-silver-etf-fof-direct-growth",
+      "footer": "Last updated from sources: 06 Nov 2026",
+      "problems": [],
+      "debug": {
+        "scheme": "hdfc-silver-etf-fof",
+        "best_similarity": 0.923,
+        "retrieved": [
+          "groww-hdfc-silver-etf-fof#exit_load",
+          "groww-hdfc-silver-etf-fof#stamp_duty",
+          "groww-hdfc-silver-etf-fof#plan",
+          "groww-hdfc-silver-etf-fof#benchmark",
+          "groww-hdfc-silver-etf-fof#isin"
+        ],
+        "ranking_query": "what is the exit load on",
+        "llm_calls": 1,
+        "prompt_tokens": 762,
+        "completion_tokens": 90,
+        "llm_latency_ms": 1396,
+        "validation": {
+          "action": "accept",
+          "issues": [],
+          "fixes": []
+        },
+        "latency_ms": 1431
+      }
+    },
+    {
+      "id": "P3-15",
+      "ok": true,
+      "kind": "answer",
+      "text": "The benchmark of HDFC Silver ETF FoF Direct Growth is Domestic Price of Silver.",
+      "source_url": "https://groww.in/mutual-funds/hdfc-silver-etf-fof-direct-growth",
+      "footer": "Last updated from sources: 06 Nov 2026",
+      "problems": [],
+      "debug": {
+        "scheme": "hdfc-silver-etf-fof",
+        "best_similarity": 0.79,
+        "retrieved": [
+          "groww-hdfc-silver-etf-fof#benchmark",
+          "groww-hdfc-silver-etf-fof#riskometer",
+          "groww-hdfc-silver-etf-fof#top_holdings",
+          "groww-hdfc-silver-etf-fof#exit_load",
+          "groww-hdfc-silver-etf-fof#expense_ratio"
+        ],
+        "ranking_query": "what is the benchmark of the",
+        "llm_calls": 1,
+        "prompt_tokens": 794,
+        "completion_tokens": 92,
+        "llm_latency_ms": 657,
+        "validation": {
+          "action": "accept",
+          "issues": [],
+          "fixes": []
+        },
+        "latency_ms": 695
+      }
+    },
+    {
+      "id": "P3-16",
+      "ok": true,
+      "kind": "answer",
+      "text": "HDFC Silver ETF FoF Direct Growth has a minimum lump sum (one-time) investment of ₹100.",
+      "source_url": "https://groww.in/mutual-funds/hdfc-silver-etf-fof-direct-growth",
+      "footer": "Last updated from sources: 06 Nov 2026",
+      "problems": [],
+      "debug": {
+        "scheme": "hdfc-silver-etf-fof",
+        "best_similarity": 0.899,
+        "retrieved": [
+          "groww-hdfc-silver-etf-fof#min_lumpsum",
+          "groww-hdfc-silver-etf-fof#min_additional_investment",
+          "groww-hdfc-silver-etf-fof#min_sip",
+          "groww-hdfc-silver-etf-fof#objective",
+          "groww-hdfc-silver-etf-fof#aum"
+        ],
+        "ranking_query": "minimum one-time investment for",
+        "llm_calls": 1,
+        "prompt_tokens": 785,
+        "completion_tokens": 95,
+        "llm_latency_ms": 733,
+        "validation": {
+          "action": "accept",
+          "issues": [],
+          "fixes": []
+        },
+        "latency_ms": 767
+      }
+    },
+    {
+      "id": "P3-17",
+      "ok": true,
+      "kind": "answer",
+      "text": "HDFC Multi Cap Fund Direct Growth has an expense ratio of 0.96% (as on 04 Nov 2026).",
+      "source_url": "https://groww.in/mutual-funds/hdfc-multi-cap-fund-direct-growth",
+      "footer": "Last updated from sources: 06 Nov 2026",
+      "problems": [],
+      "debug": {
+        "scheme": "hdfc-multi-cap",
+        "best_similarity": 0.903,
+        "retrieved": [
+          "groww-hdfc-multi-cap#expense_ratio",
+          "groww-hdfc-multi-cap#riskometer",
+          "groww-hdfc-multi-cap#min_lumpsum",
+          "groww-hdfc-multi-cap#min_sip",
+          "groww-hdfc-multi-cap#stamp_duty"
+        ],
+        "ranking_query": "what is the expense ratio of",
+        "llm_calls": 1,
+        "prompt_tokens": 742,
+        "completion_tokens": 88,
+        "llm_latency_ms": 3624,
+        "validation": {
+          "action": "accept",
+          "issues": [],
+          "fixes": []
+        },
+        "latency_ms": 3657
+      }
+    },
+    {
+      "id": "P3-18",
+      "ok": true,
+      "kind": "answer",
+      "text": "HDFC Multi Cap Fund Direct Growth has an exit load of 1% if redeemed within 1 year.",
+      "source_url": "https://groww.in/mutual-funds/hdfc-multi-cap-fund-direct-growth",
+      "footer": "Last updated from sources: 06 Nov 2026",
+      "problems": [],
+      "debug": {
+        "scheme": "hdfc-multi-cap",
+        "best_similarity": 0.864,
+        "retrieved": [
+          "groww-hdfc-multi-cap#exit_load",
+          "groww-hdfc-multi-cap#stamp_duty",
+          "groww-hdfc-multi-cap#plan",
+          "groww-hdfc-multi-cap#riskometer",
+          "groww-hdfc-multi-cap#category"
+        ],
+        "ranking_query": "exit load for",
+        "llm_calls": 1,
+        "prompt_tokens": 723,
+        "completion_tokens": 85,
+        "llm_latency_ms": 1617,
+        "validation": {
+          "action": "accept",
+          "issues": [],
+          "fixes": []
+        },
+        "latency_ms": 1649
+      }
+    },
+    {
+      "id": "P3-19",
+      "ok": true,
+      "kind": "answer",
+      "text": "The benchmark index of HDFC Multi Cap Fund Direct Growth is Nifty 500 Multicap 50:25:25 Total Return Index.",
+      "source_url": "https://groww.in/mutual-funds/hdfc-multi-cap-fund-direct-growth",
+      "footer": "Last updated from sources: 06 Nov 2026",
+      "problems": [],
+      "debug": {
+        "scheme": "hdfc-multi-cap",
+        "best_similarity": 0.897,
+        "retrieved": [
+          "groww-hdfc-multi-cap#benchmark",
+          "groww-hdfc-multi-cap#riskometer",
+          "groww-hdfc-multi-cap#top_holdings",
+          "groww-hdfc-multi-cap#category",
+          "groww-hdfc-multi-cap#exit_load"
+        ],
+        "ranking_query": "which index does use as benchmark",
+        "llm_calls": 1,
+        "prompt_tokens": 835,
+        "completion_tokens": 86,
+        "llm_latency_ms": 5519,
+        "validation": {
+          "action": "accept",
+          "issues": [],
+          "fixes": []
+        },
+        "latency_ms": 5556
+      }
+    },
+    {
+      "id": "P3-20",
+      "ok": true,
+      "kind": "answer",
+      "text": "The fund managers of HDFC Multi Cap Fund Direct Growth are Amar Kalkundrikar (since 01 Sep 2025) and Dhruv Muchhal (since 22 Jun 2023).",
+      "source_url": "https://groww.in/mutual-funds/hdfc-multi-cap-fund-direct-growth",
+      "footer": "Last updated from sources: 06 Nov 2026",
+      "problems": [],
+      "debug": {
+        "scheme": "hdfc-multi-cap",
+        "best_similarity": 0.842,
+        "retrieved": [
+          "groww-hdfc-multi-cap#fund_manager",
+          "groww-hdfc-multi-cap#riskometer",
+          "groww-hdfc-multi-cap#isin",
+          "groww-hdfc-multi-cap#fund_house",
+          "groww-hdfc-multi-cap#registrar"
+        ],
+        "ranking_query": "who are the managers of",
+        "llm_calls": 1,
+        "prompt_tokens": 734,
+        "completion_tokens": 106,
+        "llm_latency_ms": 4499,
+        "validation": {
+          "action": "accept",
+          "issues": [],
+          "fixes": []
+        },
+        "latency_ms": 4535
+      }
+    },
+    {
+      "id": "P3-21",
+      "ok": true,
+      "kind": "not_found",
+      "text": "I couldn't find that in the scheme information I have. I can answer factual questions such as the expense ratio, exit load, minimum SIP or lump sum, benchmark, riskometer, fund manager, NAV or fund size.",
+      "source_url": "https://www.amfiindia.com/investor",
+      "footer": "Last updated from sources: 06 Nov 2026",
+      "problems": [],
+      "debug": {
+        "scheme": null,
+        "best_similarity": 0.517,
+        "retrieved": [
+          "groww-hdfc-mid-cap#riskometer",
+          "groww-hdfc-multi-cap#riskometer",
+          "groww-hdfc-small-cap#riskometer",
+          "groww-hdfc-large-cap#riskometer",
+          "groww-hdfc-mid-cap#exit_load"
+        ],
+        "ranking_query": "What is the ELSS lock-in period?",
+        "llm_calls": 0,
+        "reason": "below relevance threshold",
+        "latency_ms": 18
+      }
+    },
+    {
+      "id": "P3-22",
+      "ok": true,
+      "kind": "not_found",
+      "text": "I couldn't find that for HDFC Large Cap Fund. I can answer factual questions such as the expense ratio, exit load, minimum SIP or lump sum, benchmark, riskometer, fund manager, NAV or fund size.",
+      "source_url": "https://groww.in/mutual-funds/hdfc-large-cap-fund-direct-growth",
+      "footer": "Last updated from sources: 06 Nov 2026",
+      "problems": [],
+      "debug": {
+        "scheme": null,
+        "best_similarity": 0.595,
+        "retrieved": [
+          "groww-hdfc-large-cap#objective",
+          "groww-hdfc-multi-cap#objective",
+          "groww-hdfc-silver-etf-fof#objective",
+          "groww-hdfc-large-cap#plan",
+          "groww-hdfc-mid-cap#plan"
+        ],
+        "ranking_query": "How do I download my capital gains statement?",
+        "llm_calls": 1,
+        "prompt_tokens": 760,
+        "completion_tokens": 56,
+        "llm_latency_ms": 3574,
+        "validation": {
+          "action": "not_found",
+          "issues": [
+            "model found no answer in context"
+          ],
+          "fixes": []
+        },
+        "latency_ms": 3591
+      }
+    },
+    {
+      "id": "P3-23",
+      "ok": true,
+      "kind": "not_found",
+      "text": "I couldn't find that for HDFC Mid Cap Fund. I can answer factual questions such as the expense ratio, exit load, minimum SIP or lump sum, benchmark, riskometer, fund manager, NAV or fund size.",
+      "source_url": "https://groww.in/mutual-funds/hdfc-mid-cap-fund-direct-growth",
+      "footer": "Last updated from sources: 06 Nov 2026",
+      "problems": [],
+      "debug": {
+        "scheme": "hdfc-mid-cap",
+        "best_similarity": 0.76,
+        "retrieved": [
+          "groww-hdfc-mid-cap#registrar",
+          "groww-hdfc-mid-cap#fund_manager",
+          "groww-hdfc-mid-cap#riskometer",
+          "groww-hdfc-mid-cap#top_holdings",
+          "groww-hdfc-mid-cap#isin"
+        ],
+        "ranking_query": "who is the auditor of",
+        "llm_calls": 1,
+        "prompt_tokens": 836,
+        "completion_tokens": 52,
+        "llm_latency_ms": 3516,
+        "validation": {
+          "action": "not_found",
+          "issues": [
+            "model found no answer in context"
+          ],
+          "fixes": []
+        },
+        "latency_ms": 3550
+      }
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "date": "2026-11-07",
+  "threshold": 0.57,
+  "items": 50,
+  "store": "chroma",
+  "metrics": {
+    "top1": 1.0,
+    "recall_at_5": 1.0,
+    "mrr": 1.0,
+    "synonym_recall_at_5": 1.0,
+    "scheme_leakage": 0.0,
+    "off_domain_below_threshold": 1.0,
+    "in_scope_above_threshold": 1.0
+  },
+  "similarity": {
+    "in_scope_min": 0.6321510076522827,
+    "in_scope_mean": 0.8350632056593895,
+    "off_domain_max": 0.503442645072937,
+    "off_domain_mean": 0.4658477561814444,
+    "not_in_corpus": [
+      0.595,
+      0.517,
+      0.598
+    ]
+  },
+  "suggested_threshold": 0.568,
+  "misses": []
+}
