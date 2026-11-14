@@ -1,30 +1,31 @@
 # Daily data refresh (implementation-plan.md, Phase 7).
 #
-# Every day at 10:00 IST: fetch the 5 Groww pages -> normalise -> parse -> quality gates ->
-# chunk -> embed -> store a NEW index version in the shared ChromaDB -> retrieval eval on
-# that version -> make it live -> prune old versions. The running app picks the new
-# version up within INDEX_REFRESH_SECONDS, without a restart.
-#
+# Every day at 10:00 IST (GitHub may start scheduled runs late), refresh the data:
+# fetch the 5 Groww pages -> normalise -> parse -> quality gates -> chunk -> embed -> store a
+# NEW index version -> retrieval eval on it -> make it live -> prune old versions.
 # If any step fails, the previous version stays live and a GitHub issue is opened.
 # No LLM calls: the Groq budget isn't used.
 #
-# Required repository secrets (Settings -> Secrets and variables -> Actions):
-#   Chroma Cloud:        CHROMA_API_KEY, CHROMA_TENANT, CHROMA_DATABASE
-#   or self-hosted:      CHROMA_HOST, CHROMA_PORT (default 443), CHROMA_SSL (default true),
-#                        CHROMA_AUTH_TOKEN (optional)
+# Two modes, chosen by which secrets exist:
 #
-# Manual run: Actions -> "Daily data refresh" -> Run workflow (optionally roll back to an
-# earlier version, or force a new version).
+#   app     (Fly.io deployment, ChromaDB on the app's volume)  -> secret ADMIN_TOKEN
+#           Calls POST <APP_URL>/api/admin/refresh; the deployed app refreshes itself and
+#           switches to the new version. APP_URL: repository variable, default below.
+#
+#   chroma  (shared ChromaDB: Chroma Cloud or self-hosted)      -> CHROMA_* secrets
+#           Builds the new version on this runner and writes it to the shared ChromaDB.
+#             Chroma Cloud: CHROMA_API_KEY, CHROMA_TENANT, CHROMA_DATABASE
+#             self-hosted:  CHROMA_HOST, CHROMA_PORT (443), CHROMA_SSL (true), CHROMA_AUTH_TOKEN
 
 name: Daily data refresh
 
 on:
   schedule:
-    - cron: "30 4 * * *"  # 04:30 UTC = 10:00 IST. GitHub may start scheduled runs a little late.
+    - cron: "30 4 * * *"  # 04:30 UTC = 10:00 IST
   workflow_dispatch:
     inputs:
       rollback_to:
-        description: "Re-activate this earlier index version instead of refreshing (leave empty to refresh)"
+        description: "chroma mode only: re-activate this earlier index version instead of refreshing"
         required: false
         default: ""
       force:
@@ -41,6 +42,8 @@ permissions:
   issues: write
 
 env:
+  APP_URL: ${{ vars.APP_URL || 'https://rag-chatbot-falling-dew-2905.fly.dev' }}
+  ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
   VECTOR_STORE: chroma_remote
   CHROMA_API_KEY: ${{ secrets.CHROMA_API_KEY }}
   CHROMA_TENANT: ${{ secrets.CHROMA_TENANT }}
@@ -57,46 +60,95 @@ env:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     defaults:
       run:
         working-directory: backend
     steps:
       - uses: actions/checkout@v4
 
+      - name: Choose the refresh mode
+        id: mode
+        run: |
+          if [ -n "$ADMIN_TOKEN" ]; then
+            echo "mode=app" >> "$GITHUB_OUTPUT"; echo "Mode: app ($APP_URL)"
+          elif [ -n "$CHROMA_API_KEY" ] || [ -n "$CHROMA_HOST" ]; then
+            echo "mode=chroma" >> "$GITHUB_OUTPUT"; echo "Mode: shared ChromaDB"
+          else
+            echo "::error::No refresh target configured. Set the ADMIN_TOKEN secret (Fly.io deployment) or the CHROMA_* secrets (shared ChromaDB)."
+            exit 1
+          fi
+
+      # ================================================================ app mode
+      - name: Refresh the deployed app's data
+        if: ${{ steps.mode.outputs.mode == 'app' }}
+        env:
+          FORCE: ${{ inputs.force && 'true' || 'false' }}
+          ROLLBACK_TO: ${{ inputs.rollback_to }}
+        run: |
+          if [ -n "$ROLLBACK_TO" ]; then
+            echo "::error::rollback_to isn't supported in app mode. Use: fly ssh console -a <app> -C 'python -m app.ingest --activate $ROLLBACK_TO'"
+            exit 1
+          fi
+          endpoint="$APP_URL/api/admin/refresh"
+          query=""; [ "$FORCE" = "true" ] && query="?force=true"
+          # Start (retries cover a cold start: the machine auto-starts on the first request).
+          code=000
+          for i in $(seq 1 20); do
+            code=$(curl -s -m 30 -o start.json -w '%{http_code}' -X POST \
+                   -H "Authorization: Bearer $ADMIN_TOKEN" "$endpoint$query" || true)
+            [ "$code" = "202" ] && break
+            echo "attempt $i: HTTP $code"; sleep 15
+          done
+          if [ "$code" != "202" ]; then
+            echo "::error::Could not start the refresh (HTTP $code)"; cat start.json 2>/dev/null || true; exit 1
+          fi
+          jq . start.json
+          # Poll until done (requests also keep the machine awake while it works).
+          state=running
+          for i in $(seq 1 80); do
+            sleep 15
+            curl -fsS -m 30 -H "Authorization: Bearer $ADMIN_TOKEN" "$endpoint" -o status.json || continue
+            state=$(jq -r '.job.state' status.json)
+            echo "state: $state"
+            [ "$state" != "running" ] && break
+          done
+          jq -r '.job.summary // ""' status.json >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
+          case "$state" in
+            succeeded|no_changes) echo "Refresh $state." ;;
+            *) echo "::error::Refresh $state"; jq '.job.problems' status.json 2>/dev/null || true; exit 1 ;;
+          esac
+
+      # ================================================================ chroma mode
       - uses: actions/setup-python@v5
+        if: ${{ steps.mode.outputs.mode == 'chroma' }}
         with:
           python-version: "3.12"
           cache: pip
           cache-dependency-path: backend/pyproject.toml
 
       - name: Cache the embedding model
+        if: ${{ steps.mode.outputs.mode == 'chroma' }}
         uses: actions/cache@v4
         with:
           path: ~/.cache/huggingface
           key: hf-${{ runner.os }}-bge-small-en-v1.5
 
       - name: Install
-        run: pip install -e ".[ingest,rag]"
-
-      - name: Check the ChromaDB secrets are set
+        if: ${{ steps.mode.outputs.mode == 'chroma' }}
         run: |
-          if [ -z "$CHROMA_API_KEY" ] && [ -z "$CHROMA_HOST" ]; then
-            echo "::error::Set CHROMA_API_KEY (Chroma Cloud) or CHROMA_HOST (self-hosted) in the repository secrets."
-            exit 1
-          fi
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install -e ".[ingest,rag]"
 
-      # ---------------------------------------------------------------- rollback only
       - name: Roll back to an earlier version
-        if: ${{ inputs.rollback_to }}
+        if: ${{ steps.mode.outputs.mode == 'chroma' && inputs.rollback_to }}
         env:
           ROLLBACK_TO: ${{ inputs.rollback_to }}
         run: python -m app.ingest --activate "$ROLLBACK_TO" --summary "$GITHUB_STEP_SUMMARY"
 
-      # ---------------------------------------------------------------- refresh
       - name: Stage a new version (fetch, normalise, parse, gates, chunk, embed, store)
         id: stage
-        if: ${{ !inputs.rollback_to }}
+        if: ${{ steps.mode.outputs.mode == 'chroma' && !inputs.rollback_to }}
         continue-on-error: true  # retried below with browser rendering
         env:
           FORCE_FLAG: ${{ inputs.force && '--force' || '' }}
@@ -104,7 +156,7 @@ jobs:
 
       - name: Retry with browser rendering (pages that need JavaScript)
         id: retry
-        if: ${{ !inputs.rollback_to && steps.stage.outcome == 'failure' }}
+        if: ${{ steps.mode.outputs.mode == 'chroma' && !inputs.rollback_to && steps.stage.outcome == 'failure' }}
         env:
           FORCE_FLAG: ${{ inputs.force && '--force' || '' }}
         run: |
@@ -113,7 +165,7 @@ jobs:
 
       - name: Pick the staged version
         id: staged
-        if: ${{ !inputs.rollback_to }}
+        if: ${{ steps.mode.outputs.mode == 'chroma' && !inputs.rollback_to }}
         run: |
           echo "version=${{ steps.stage.outputs.version || steps.retry.outputs.version }}" >> "$GITHUB_OUTPUT"
           echo "changed=${{ steps.stage.outputs.changed || steps.retry.outputs.changed }}" >> "$GITHUB_OUTPUT"
@@ -131,12 +183,11 @@ jobs:
         run: python -m app.ingest --activate "$VERSION" --summary "$GITHUB_STEP_SUMMARY"
 
       - name: Delete old versions (keep the live one + 2 for rollback)
-        if: ${{ !inputs.rollback_to }}
+        if: ${{ steps.mode.outputs.mode == 'chroma' && !inputs.rollback_to }}
         run: python -m app.ingest --prune --keep 3 --summary "$GITHUB_STEP_SUMMARY"
 
-      # ---------------------------------------------------------------- audit & alerts
       - name: Upload snapshots, parsed data and eval results
-        if: always()
+        if: ${{ always() && steps.mode.outputs.mode == 'chroma' }}
         uses: actions/upload-artifact@v4
         with:
           name: data-refresh-${{ github.run_id }}
@@ -148,6 +199,7 @@ jobs:
             data/facts.json
             backend/tests/eval/results/
 
+      # ================================================================ alerts
       - name: Open or update a GitHub issue on failure
         if: failure()
         env:

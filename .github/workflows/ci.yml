@@ -2,10 +2,16 @@ name: CI
 
 on:
   push:
+    branches-ignore: [main]  # on main, fly-deploy.yml runs this workflow before deploying
   pull_request:
+  workflow_call:
+
+permissions:
+  contents: read
 
 jobs:
   backend:
+    name: Lint and tests
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -15,9 +21,76 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      # Tests use ChromaDB + BM25 (rag) and the fetcher (ingest); the embedding model
-      # itself is faked in tests, so no model download is needed. The web UI (frontend/)
-      # has no build step; test_api.py checks the backend serves it.
+          cache: pip
+          cache-dependency-path: backend/pyproject.toml
+      # CPU-only PyTorch first: the default Linux wheel bundles CUDA (several GB).
+      # Tests use ChromaDB + BM25 (rag) and the fetcher (ingest); the embedding model is
+      # faked in tests, so no model download is needed.
+      - run: pip install --index-url https://download.pytorch.org/whl/cpu torch
       - run: pip install -e ".[dev,ingest,rag]"
       - run: ruff check .
-      - run: pytest
+      - run: pytest -q
+
+  docker:
+    name: Docker image smoke test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build the image
+        run: docker build -t fund-facts:ci .
+
+      - name: First start on an empty volume (builds the index)
+        run: |
+          docker volume create ragdata
+          docker run -d --name app -p 8080:8080 -v ragdata:/data \
+            -e ADMIN_TOKEN=ci-admin-token fund-facts:ci
+          for i in $(seq 1 60); do
+            if curl -fsS http://localhost:8080/api/health -o health.json; then break; fi
+            sleep 5
+          done
+          cat health.json; echo
+          jq -e '.status == "ok" and .index_loaded == true and .index_version != null' health.json
+
+      - name: UI, API and a chat round-trip (no LLM key needed for these replies)
+        run: |
+          set -e
+          curl -fsS http://localhost:8080/ | grep -q "Facts-only. No investment advice."
+          curl -fsS http://localhost:8080/js/app.js -o /dev/null
+          curl -fsS http://localhost:8080/api/meta | jq -e '.schemes | length == 5'
+          tid=$(curl -fsS -X POST http://localhost:8080/api/threads | jq -r .id)
+          curl -fsS -X POST "http://localhost:8080/api/threads/$tid/messages" \
+            -H 'Content-Type: application/json' -d '{"text":"Should I invest in HDFC Mid Cap?"}' \
+            | tee reply.json | jq -e '.message.kind == "refusal"'
+          curl -fsS -X POST "http://localhost:8080/api/threads/$tid/messages" \
+            -H 'Content-Type: application/json' -d '{"text":"What is the capital of France?"}' \
+            | jq -e '.message.kind == "not_found"'
+          echo "$tid" > thread_id
+          # Admin endpoints need the token.
+          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST http://localhost:8080/api/admin/refresh)" = "401"
+          curl -fsS -H "Authorization: Bearer ci-admin-token" http://localhost:8080/api/admin/refresh | jq .
+
+      - name: Memory use
+        run: |
+          docker stats --no-stream --format "{{.Name}}: {{.MemUsage}} ({{.MemPerc}})" app | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Restart keeps chats and the index (persistent volume)
+        run: |
+          set -e
+          before=$(jq -r .index_version health.json)
+          docker restart app
+          for i in $(seq 1 30); do
+            if curl -fsS http://localhost:8080/api/health -o health2.json; then break; fi
+            sleep 3
+          done
+          jq -e --arg v "$before" '.index_version == $v' health2.json
+          tid=$(cat thread_id)
+          curl -fsS "http://localhost:8080/api/threads/$tid/messages" | jq -e 'length == 4'
+          if docker logs app 2>&1 | grep -c "no index in" | grep -qv '^1$'; then
+            echo "::error::the index was rebuilt on restart"; exit 1
+          fi
+
+      - name: Container logs
+        if: always()
+        run: docker logs app 2>&1 | tail -150

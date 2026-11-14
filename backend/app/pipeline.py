@@ -270,6 +270,8 @@ class IndexSource:
 
     catalog: Any  # app.ingest.catalog.Catalog
     make_retriever: Callable[[str], Any]  # version -> Retriever
+    store: Any = None  # the vector store the pipeline reads (reused by the in-app refresh)
+    embedder: Any = None
 
 
 def reload_if_changed(pipeline: Pipeline) -> str | None:
@@ -356,5 +358,6 @@ def build_pipeline(settings=None, limiter=None) -> Pipeline:
                         rewriter=rewriter,
                         refusal_urls={"advice": amfi, "comparison": amfi, "prediction": sebi})
     pipeline.limiter = limiter
-    pipeline.index_source = IndexSource(catalog=catalog, make_retriever=make_retriever)
+    pipeline.index_source = IndexSource(catalog=catalog, make_retriever=make_retriever,
+                                        store=store, embedder=get_embedder(settings.embed_model))
     return pipeline

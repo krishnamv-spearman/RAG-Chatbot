@@ -1,0 +1,47 @@
+# Build context for the Docker image: only what the image needs.
+# (backend/tests stays in: the in-app refresh runs the retrieval eval as a quality gate.)
+
+# VCS, CI, docs, design files
+.git
+.github
+docs
+stitch_fund_facts_financial_assistant
+*.md
+
+# Secrets
+**/.env
+**/.env.*
+!**/.env.example
+
+# Python / tooling caches
+**/__pycache__
+**/*.py[cod]
+**/.venv
+**/venv
+**/*.egg-info
+**/.pytest_cache
+**/.ruff_cache
+backend/tests/eval/results
+
+# Runtime data (rebuilt in the volume at start-up)
+data/raw
+data/parsed
+data/chroma
+data/bm25.json
+data/bm25-*.json
+data/index_manifest.json
+data/index_versions
+data/*.tmp
+data/embeddings.csv
+data/embeddings.json
+data/app.db
+data/app.db-*
+
+# Editors / OS
+**/.vscode
+**/.idea
+**/.DS_Store
+**/Thumbs.db
+
+# Fly config isn't needed inside the image
+fly.toml

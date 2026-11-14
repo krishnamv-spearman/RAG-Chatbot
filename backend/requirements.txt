@@ -1,5 +1,0 @@
-﻿fastapi
-uvicorn
-groq
-pypdf
-python-multipart

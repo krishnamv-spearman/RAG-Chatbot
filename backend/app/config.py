@@ -61,6 +61,10 @@ class Settings(BaseSettings):
     index_refresh_seconds: int = 300
     # /api/health reports stale=true when the corpus data is older than this.
     stale_after_days: int = 2
+    # Bearer token for the admin endpoints (POST/GET /api/admin/refresh), used by the daily
+    # GitHub Actions refresh to make the deployed app refresh its own data. Unset = the
+    # admin endpoints don't exist (404).
+    admin_token: SecretStr | None = None
     pinecone_api_key: SecretStr | None = None
     pinecone_index: str = "mf-faq"
     pinecone_namespace_prefix: str = "dev"  # namespaces are "<prefix>-<build version>"

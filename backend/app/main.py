@@ -14,6 +14,7 @@ Routes:
 """
 
 import asyncio
+import hmac
 import logging
 import sqlite3
 import time
@@ -59,9 +60,12 @@ class ClientRateLimiter:
         return None
 
 
-def create_app(settings: Settings | None = None, pipeline=None, pipeline_factory=None) -> FastAPI:
+def create_app(settings: Settings | None = None, pipeline=None, pipeline_factory=None,
+               refresher=None) -> FastAPI:
     """`pipeline` (already built, e.g. a test double) is used as-is; otherwise
-    `pipeline_factory` (default: the real build_pipeline) runs at startup."""
+    `pipeline_factory` (default: the real build_pipeline) runs at startup. `refresher`
+    (tests) replaces the in-app refresh job that is otherwise built at startup when
+    ADMIN_TOKEN is set."""
     settings = settings or get_settings()
     data_dir = settings.resolved_data_dir()
 
@@ -82,6 +86,13 @@ def create_app(settings: Settings | None = None, pipeline=None, pipeline_factory
             except Exception as exc:  # edge case RET-10 / GAP-20: start in degraded mode
                 app.state.pipeline_error = f"{type(exc).__name__}: {exc}"
                 logger.error("pipeline not ready", extra={"error": app.state.pipeline_error})
+            app.state.pipeline_factory = factory
+        if _admin_enabled(settings) and app.state.refresher is None:
+            try:
+                app.state.refresher = await run_in_threadpool(_make_refresher, app, settings)
+            except Exception as exc:  # noqa: BLE001 - the app still serves answers
+                app.state.refresher_error = f"{type(exc).__name__}: {exc}"
+                logger.error("refresh unavailable", extra={"error": app.state.refresher_error})
         if not settings.llm_configured:
             logger.warning("LLM_API_KEY is not set: factual answers will be unavailable")
         watcher = None
@@ -97,6 +108,9 @@ def create_app(settings: Settings | None = None, pipeline=None, pipeline_factory
     app.state.db = Database(data_dir / settings.db_file)
     app.state.pipeline = pipeline
     app.state.pipeline_error = None
+    app.state.pipeline_factory = pipeline_factory
+    app.state.refresher = refresher
+    app.state.refresher_error = None
     app.state.locks: dict[str, asyncio.Lock] = {}
     app.state.client_limiter = ClientRateLimiter(settings.api_messages_per_minute)
 
@@ -255,7 +269,36 @@ def create_app(settings: Settings | None = None, pipeline=None, pipeline_factory
             "corpus_date": corpus_date,
             "stale": is_stale(corpus_date, settings.stale_after_days),
             "llm_budget": limiter.snapshot() if limiter else None,
+            "last_refresh": _refresh_brief(app.state.refresher),
         }
+
+    # ------------------------------------------------------------ admin: data refresh
+
+    def _require_admin(request: Request) -> None:
+        if not _admin_enabled(settings):
+            raise HTTPException(404, "Not Found")
+        expected = f"Bearer {settings.admin_token.get_secret_value().strip()}"
+        given = request.headers.get("authorization", "")
+        if not hmac.compare_digest(given.encode(), expected.encode()):
+            raise HTTPException(401, "Invalid admin token.",
+                                headers={"WWW-Authenticate": "Bearer"})
+
+    @app.post("/api/admin/refresh", status_code=202)
+    def start_refresh(request: Request, force: bool = False):
+        """Fetch the latest data and switch to it if every quality gate passes
+        (called daily by GitHub Actions). Returns immediately; poll GET for the result."""
+        _require_admin(request)
+        if app.state.refresher is None:
+            raise HTTPException(503, "Refresh isn't available: "
+                                     f"{app.state.refresher_error or 'not initialised'}")
+        job, started = app.state.refresher.start(force=force, trigger="api")
+        return {"started": started, "job": job.to_dict()}
+
+    @app.get("/api/admin/refresh")
+    def refresh_status(request: Request):
+        _require_admin(request)
+        job = app.state.refresher.status() if app.state.refresher else None
+        return {"job": job.to_dict() if job else None}
 
     # ------------------------------------------------------------ web UI (Phase 6)
     # Mounted last so /api/* routes win. No build step: frontend/ is served as-is.
@@ -272,6 +315,50 @@ def create_app(settings: Settings | None = None, pipeline=None, pipeline_factory
         app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="ui")
 
     return app
+
+
+def _refresh_brief(refresher) -> dict | None:
+    """Public, secret-free view of the last in-app refresh (for /api/health)."""
+    job = refresher.status() if refresher else None
+    if job is None:
+        return None
+    return {"state": job.state, "started_at": job.started_at,
+            "finished_at": job.finished_at, "version": job.version}
+
+
+def _admin_enabled(settings: Settings) -> bool:
+    return bool(settings.admin_token and settings.admin_token.get_secret_value().strip())
+
+
+def _make_refresher(app: FastAPI, settings: Settings):
+    """The in-app refresh job. Reuses the pipeline's store and model when the pipeline is
+    up; otherwise opens its own, so a degraded app (no index yet) can build one."""
+    from app.ingest.refresh import Refresher
+    from app.pipeline import reload_if_changed
+
+    source = getattr(app.state.pipeline, "index_source", None)
+    if source is not None and source.store is not None:
+        store, catalog, embedder = source.store, source.catalog, source.embedder
+    else:
+        from app.embeddings import get_embedder
+        from app.ingest.catalog import get_catalog
+        from app.vectorstore import get_vector_store
+
+        data_dir = settings.resolved_data_dir()
+        store = get_vector_store(settings, data_dir)
+        catalog = get_catalog(store, data_dir)
+        embedder = get_embedder(settings.embed_model)
+
+    def activated() -> None:
+        if app.state.pipeline is None and app.state.pipeline_factory is not None:
+            app.state.pipeline = app.state.pipeline_factory()  # degraded -> healthy
+            app.state.pipeline_error = None
+        elif app.state.pipeline is not None:
+            reload_if_changed(app.state.pipeline)
+
+    return Refresher(settings.resolved_data_dir(), store, catalog, embedder,
+                     settings.embed_model, settings.relevance_threshold,
+                     on_activated=activated)
 
 
 def is_stale(corpus_date: str | None, max_age_days: int, today: date | None = None) -> bool:

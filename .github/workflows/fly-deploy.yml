@@ -1,0 +1,96 @@
+# Deploy to Fly.io: https://fly.io/docs/app-guides/continuous-deployment-with-github-actions/
+#
+# On every push to main (and on demand): run CI (lint, tests, Docker image smoke test),
+# then deploy ONE machine with ONE persistent volume, then smoke-test the live URL.
+#
+# Repository secrets (Settings -> Secrets and variables -> Actions):
+#   FLY_API_TOKEN  required  `fly tokens create deploy -a rag-chatbot-falling-dew-2905`
+#   LLM_API_KEY    required  Groq API key (stored as a Fly secret, never in the image)
+#   ADMIN_TOKEN    optional  enables the daily in-app refresh (POST /api/admin/refresh)
+
+name: Fly Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: fly-deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  deploy:
+    name: Deploy app
+    needs: ci
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      FLY_APP: rag-chatbot-falling-dew-2905
+      FLY_REGION: sin
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check the required secrets
+        env:
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+        run: |
+          missing=""
+          [ -n "$FLY_API_TOKEN" ] || missing="$missing FLY_API_TOKEN"
+          [ -n "$LLM_API_KEY" ] || missing="$missing LLM_API_KEY"
+          if [ -n "$missing" ]; then
+            echo "::error::Missing repository secrets:$missing (Settings -> Secrets and variables -> Actions)"
+            exit 1
+          fi
+
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Make sure the data volume exists
+        run: |
+          count=$(flyctl volumes list --app "$FLY_APP" --json | jq '[.[] | select(.name == "rag_data")] | length')
+          if [ "$count" = "0" ]; then
+            flyctl volumes create rag_data --app "$FLY_APP" --region "$FLY_REGION" --size 1 --yes
+          else
+            echo "volume rag_data exists ($count)"
+          fi
+
+      - name: Update app secrets (applied by the deploy)
+        env:
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
+        run: |
+          # Via stdin, so values never appear on a command line.
+          {
+            printf 'LLM_API_KEY=%s\n' "$LLM_API_KEY"
+            if [ -n "$ADMIN_TOKEN" ]; then printf 'ADMIN_TOKEN=%s\n' "$ADMIN_TOKEN"; fi
+          } | flyctl secrets import --app "$FLY_APP" --stage
+
+      - name: Deploy (one machine)
+        run: flyctl deploy --app "$FLY_APP" --remote-only --ha=false --wait-timeout 600
+
+      - name: Keep exactly one machine (chats and data live on its volume)
+        run: flyctl scale count 1 --app "$FLY_APP" --yes
+
+      - name: Smoke test the live app
+        run: |
+          url="https://$FLY_APP.fly.dev"
+          for i in $(seq 1 40); do
+            if curl -fsS -m 20 "$url/api/health" -o health.json \
+               && jq -e '.status == "ok" and .index_loaded == true' health.json >/dev/null; then
+              break
+            fi
+            sleep 10
+          done
+          cat health.json; echo
+          jq -e '.status == "ok" and .index_loaded == true and .llm_configured == true' health.json
+          curl -fsS -m 20 "$url/" | grep -q "Facts-only. No investment advice."
+          curl -fsS -m 20 "$url/api/meta" | jq -e '.schemes | length == 5'
+          echo "### Deployed: $url" >> "$GITHUB_STEP_SUMMARY"
+          jq -r '"Index version \(.index_version), data as on \(.corpus_date)"' health.json >> "$GITHUB_STEP_SUMMARY"
