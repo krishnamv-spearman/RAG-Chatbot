@@ -1,6 +1,8 @@
 # Daily Data Refresh
 
 > Operations guide for the scheduled refresh built in Phase 7 ([implementation-plan.md](implementation-plan.md)). The README (Phase 9) links here.
+>
+> **Production setup:** Render (backend) + Chroma Cloud, so the workflow runs in **"chroma" mode** (`CHROMA_API_KEY`, `CHROMA_TENANT`, `CHROMA_DATABASE` GitHub secrets). The "app" mode (`ADMIN_TOKEN` + `APP_URL`) is only for a backend with a local index on a persistent disk. Full deployment guide: [deployment.md](deployment.md).
 
 Every day at **10:00 IST** a GitHub Actions workflow ([`.github/workflows/data-refresh.yml`](../.github/workflows/data-refresh.yml)) fetches the 5 Groww pages again and rebuilds the index, so answers and their "Last updated from sources" dates stay current. The running app switches to the new data by itself, without a restart.
 

@@ -74,8 +74,13 @@ class Settings(BaseSettings):
     # Paths
     data_dir: Path = Field(default=PROJECT_ROOT / "data")
 
-    # API: comma-separated list of allowed browser origins
+    # API: browser origins allowed to call the API from another origin (CORS), e.g. the
+    # Vercel frontend. Comma-separated exact origins, e.g.
+    #   CORS_ORIGINS=https://fund-facts.vercel.app,https://www.example.com
+    # plus an optional regex for Vercel preview deployments, e.g.
+    #   CORS_ORIGIN_REGEX=^https://fund-facts-[a-z0-9-]+-myteam\.vercel\.app$
     cors_origins: str = "http://localhost:5173"
+    cors_origin_regex: str | None = None
     # Messages per client IP per minute (edge case GAP-37), counting every message. The
     # Groq budget separately caps factual answers (~8-9/minute in total), so this mainly
     # stops scripted flooding.

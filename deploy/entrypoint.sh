@@ -12,8 +12,10 @@ cp /srv/seed/sources.yaml /srv/seed/schemes.yaml /srv/seed/refusal_links.yaml "$
 
 cd /srv/backend
 
-# First start on an empty volume: fetch the 5 pages and build the index (about a minute).
-# With a shared ChromaDB (VECTOR_STORE=chroma_remote) the index already lives there.
+# Local index only (VECTOR_STORE=chroma): on the first start with an empty DATA_DIR, fetch
+# the 5 pages and build the index (about a minute). With VECTOR_STORE=chroma_remote
+# (Render + Chroma Cloud) the index lives in Chroma and is built by the daily refresh
+# workflow; until then the app runs degraded and heals itself when the index appears.
 if [ "${VECTOR_STORE:-chroma}" != "chroma_remote" ] && [ ! -f "$DATA_DIR/index_manifest.json" ]; then
   echo "entrypoint: no index in $DATA_DIR, building it now (first start on this volume)"
   if ! python -m app.ingest; then
@@ -22,7 +24,7 @@ if [ "${VECTOR_STORE:-chroma}" != "chroma_remote" ] && [ ! -f "$DATA_DIR/index_m
   fi
 fi
 
-# --proxy-headers: behind Fly's proxy, take the client IP from X-Forwarded-For so the
+# --proxy-headers: behind Render's proxy, take the client IP from X-Forwarded-For so the
 # per-client rate limit applies per user, not to everyone at once.
 exec python -m uvicorn app.main:app \
   --host 0.0.0.0 --port "${PORT:-8080}" \

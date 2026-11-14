@@ -1,4 +1,11 @@
-// Thin client for the FastAPI backend (same origin).
+// Thin client for the FastAPI backend.
+//
+// API base URL comes from js/config.js (window.FUND_FACTS_CONFIG.apiBase):
+//   ""                                  same origin (local dev, or UI served by the backend)
+//   "https://<service>.onrender.com"    Vercel deployment calling the Render backend (CORS)
+
+const API_BASE = ((window.FUND_FACTS_CONFIG && window.FUND_FACTS_CONFIG.apiBase) || "")
+  .replace(/\/+$/, "");
 
 export class ApiError extends Error {
   constructor(status, message) {
@@ -10,7 +17,7 @@ export class ApiError extends Error {
 async function request(method, path, body) {
   let response;
   try {
-    response = await fetch(path, {
+    response = await fetch(API_BASE + path, {
       method,
       headers: body ? { "Content-Type": "application/json" } : undefined,
       body: body ? JSON.stringify(body) : undefined,

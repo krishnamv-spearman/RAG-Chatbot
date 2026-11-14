@@ -43,5 +43,8 @@ data/app.db-*
 **/.DS_Store
 **/Thumbs.db
 
-# Fly config isn't needed inside the image
-fly.toml
+# Deployment config and the Vercel build output aren't needed inside the image
+render.yaml
+frontend/dist
+frontend/vercel.json
+frontend/build.sh

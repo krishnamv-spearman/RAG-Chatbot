@@ -6,16 +6,18 @@
 # If any step fails, the previous version stays live and a GitHub issue is opened.
 # No LLM calls: the Groq budget isn't used.
 #
-# Two modes, chosen by which secrets exist:
+# Two modes, chosen by which secrets exist (chroma wins if both are configured):
 #
-#   app     (Fly.io deployment, ChromaDB on the app's volume)  -> secret ADMIN_TOKEN
-#           Calls POST <APP_URL>/api/admin/refresh; the deployed app refreshes itself and
-#           switches to the new version. APP_URL: repository variable, default below.
-#
-#   chroma  (shared ChromaDB: Chroma Cloud or self-hosted)      -> CHROMA_* secrets
-#           Builds the new version on this runner and writes it to the shared ChromaDB.
+#   chroma  PRODUCTION (Render + Chroma Cloud)                  -> CHROMA_* secrets
+#           Builds the new version on this runner and writes it to Chroma Cloud; the
+#           Render backend picks it up within INDEX_REFRESH_SECONDS. The 512 MB free
+#           instance does no refresh work.
 #             Chroma Cloud: CHROMA_API_KEY, CHROMA_TENANT, CHROMA_DATABASE
 #             self-hosted:  CHROMA_HOST, CHROMA_PORT (443), CHROMA_SSL (true), CHROMA_AUTH_TOKEN
+#
+#   app     backend with a local index on a persistent disk     -> secret ADMIN_TOKEN +
+#           repository variable APP_URL. Calls POST <APP_URL>/api/admin/refresh; the
+#           deployed backend refreshes itself.
 
 name: Daily data refresh
 
@@ -42,7 +44,7 @@ permissions:
   issues: write
 
 env:
-  APP_URL: ${{ vars.APP_URL || 'https://rag-chatbot-falling-dew-2905.fly.dev' }}
+  APP_URL: ${{ vars.APP_URL }}
   ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
   VECTOR_STORE: chroma_remote
   CHROMA_API_KEY: ${{ secrets.CHROMA_API_KEY }}
@@ -70,12 +72,12 @@ jobs:
       - name: Choose the refresh mode
         id: mode
         run: |
-          if [ -n "$ADMIN_TOKEN" ]; then
+          if [ -n "$CHROMA_API_KEY" ] || [ -n "$CHROMA_HOST" ]; then
+            echo "mode=chroma" >> "$GITHUB_OUTPUT"; echo "Mode: shared ChromaDB (Chroma Cloud)"
+          elif [ -n "$ADMIN_TOKEN" ] && [ -n "$APP_URL" ]; then
             echo "mode=app" >> "$GITHUB_OUTPUT"; echo "Mode: app ($APP_URL)"
-          elif [ -n "$CHROMA_API_KEY" ] || [ -n "$CHROMA_HOST" ]; then
-            echo "mode=chroma" >> "$GITHUB_OUTPUT"; echo "Mode: shared ChromaDB"
           else
-            echo "::error::No refresh target configured. Set the ADMIN_TOKEN secret (Fly.io deployment) or the CHROMA_* secrets (shared ChromaDB)."
+            echo "::error::No refresh target configured. Production (Render + Chroma Cloud): set the CHROMA_API_KEY, CHROMA_TENANT and CHROMA_DATABASE secrets. Or, for a backend with a local index: the ADMIN_TOKEN secret and the APP_URL variable."
             exit 1
           fi
 
@@ -87,7 +89,7 @@ jobs:
           ROLLBACK_TO: ${{ inputs.rollback_to }}
         run: |
           if [ -n "$ROLLBACK_TO" ]; then
-            echo "::error::rollback_to isn't supported in app mode. Use: fly ssh console -a <app> -C 'python -m app.ingest --activate $ROLLBACK_TO'"
+            echo "::error::rollback_to isn't supported in app mode. Run 'python -m app.ingest --activate $ROLLBACK_TO' in the backend's shell instead."
             exit 1
           fi
           endpoint="$APP_URL/api/admin/refresh"

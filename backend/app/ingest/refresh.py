@@ -1,6 +1,8 @@
-"""In-process data refresh for a single deployed app (e.g. Fly.io with a persistent volume).
+"""In-process data refresh for a backend with a LOCAL index on a persistent disk
+(VECTOR_STORE=chroma). Not used in the Render + Chroma Cloud production setup, where the
+daily workflow builds new versions on the GitHub runner instead ("chroma" mode).
 
-The daily GitHub Actions job calls `POST /api/admin/refresh`; the app then runs, in a
+In "app" mode the daily GitHub Actions job calls `POST /api/admin/refresh`; the app runs, in a
 background thread and in its own process (so it shares the app's ChromaDB client):
 
     fetch -> parse -> quality gates -> stage new version -> retrieval eval on it

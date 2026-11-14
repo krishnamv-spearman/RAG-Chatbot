@@ -334,3 +334,51 @@ async def test_meta_and_health(client):
     assert meta["corpus_last_updated"] == "2026-11-06"
     health = (await client.get("/api/health")).json()
     assert health["status"] == "ok" and health["index_loaded"] is True
+
+
+# ---------------------------------------------------------------- CORS (Vercel frontend)
+
+VERCEL = "https://fund-facts.vercel.app"
+PREVIEW = "https://fund-facts-git-feature-x-myteam.vercel.app"
+
+
+@pytest.fixture
+async def cors_client(tmp_path):
+    settings = make_settings(tmp_path, cors_origins=VERCEL, api_messages_per_minute=1,
+                             cors_origin_regex=r"^https://fund-facts-[a-z0-9-]+-myteam\.vercel\.app$")
+    app = create_app(settings, pipeline=make_pipeline())
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app),
+                                 base_url="http://test") as c:
+        yield c
+
+
+@pytest.mark.parametrize("origin", [VERCEL, PREVIEW])
+async def test_cors_preflight_allows_the_vercel_origins(cors_client, origin):
+    r = await cors_client.options("/api/threads", headers={
+        "Origin": origin, "Access-Control-Request-Method": "POST",
+        "Access-Control-Request-Headers": "content-type"})
+    assert r.status_code == 200
+    assert r.headers["access-control-allow-origin"] == origin
+    assert "POST" in r.headers["access-control-allow-methods"]
+
+
+async def test_cors_rejects_other_origins(cors_client):
+    r = await cors_client.options("/api/threads", headers={
+        "Origin": "https://evil.example", "Access-Control-Request-Method": "POST"})
+    assert r.status_code == 400
+    r = await cors_client.get("/api/health", headers={"Origin": "https://evil.example"})
+    assert "access-control-allow-origin" not in r.headers
+
+
+async def test_error_responses_still_carry_cors_headers(cors_client):
+    tid = (await cors_client.post("/api/threads", headers={"Origin": VERCEL})).json()["id"]
+    big = await cors_client.post(f"/api/threads/{tid}/messages", content=b"{" + b" " * 20000 + b"}",
+                                 headers={"Origin": VERCEL, "content-type": "application/json"})
+    assert big.status_code == 413 and big.headers["access-control-allow-origin"] == VERCEL
+    await cors_client.post(f"/api/threads/{tid}/messages", json={"text": "hi"},
+                           headers={"Origin": VERCEL})
+    limited = await cors_client.post(f"/api/threads/{tid}/messages", json={"text": "hi"},
+                                     headers={"Origin": VERCEL})
+    assert limited.status_code == 429
+    assert limited.headers["access-control-allow-origin"] == VERCEL
+    assert "retry-after" in limited.headers["access-control-expose-headers"].lower()

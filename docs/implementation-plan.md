@@ -443,6 +443,7 @@ R4. **Keep the experiment harness** `tests/eval/retrieval_experiments.py` for fu
    - Selected AMC (HDFC Mutual Fund) and the 5 schemes, with source links.
    - Architecture overview: a short summary of the RAG pipeline, linking to [architecture.md](architecture.md).
    - Daily data refresh (Phase 7): schedule, GitHub Secrets, manual run, rollback.
+   - Deployment: Vercel (frontend) + Render Free (backend, Docker) + Chroma Cloud (vectors); link [deployment.md](deployment.md).
    - Known limitations (Arch §15, plus anything found during Phase 8).
    - The eval results table from the latest run.
 2. **Update problemStatement.md §8:** mark each open question as resolved and link to the matching decision in Arch §2.

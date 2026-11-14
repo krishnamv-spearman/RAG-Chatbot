@@ -1,0 +1,49 @@
+# Render Blueprint for the Fund Facts backend: https://render.com/docs/blueprint-spec
+#
+# Free web service built from ./Dockerfile. Vectors live in Chroma Cloud
+# (VECTOR_STORE=chroma_remote), written by the daily refresh workflow
+# (.github/workflows/data-refresh.yml); this service only reads them and switches to new
+# versions by itself. The frontend is deployed separately on Vercel (frontend/vercel.json).
+#
+# Free-plan limits (accepted): 512 MB RAM; sleeps after ~15 min idle (first request then
+# takes up to ~1 min); no persistent disk, so chat threads (SQLite) reset on every restart.
+#
+# Variables marked `sync: false` are secrets or deployment-specific: Render asks for them
+# when the Blueprint is created; they are never stored in this repository.
+
+services:
+  - type: web
+    name: fund-facts-api
+    runtime: docker
+    plan: free
+    region: singapore
+    branch: main
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    autoDeployTrigger: checksPass  # deploy a main commit only after its GitHub checks (CI) pass
+    envVars:
+      # --- vector store: Chroma Cloud
+      - key: VECTOR_STORE
+        value: chroma_remote
+      - key: CHROMA_API_KEY
+        sync: false
+      - key: CHROMA_TENANT
+        sync: false
+      - key: CHROMA_DATABASE
+        sync: false
+      # --- LLM (Groq)
+      - key: LLM_API_KEY
+        sync: false
+      - key: LLM_MODEL
+        value: openai/gpt-oss-120b
+      # --- browser origins allowed to call the API (the Vercel frontend)
+      - key: CORS_ORIGINS
+        sync: false  # e.g. https://fund-facts.vercel.app
+      - key: CORS_ORIGIN_REGEX
+        sync: false  # optional, Vercel previews, e.g. ^https://fund-facts-[a-z0-9-]+\.vercel\.app$
+      # --- behaviour
+      - key: INDEX_REFRESH_SECONDS
+        value: "300"
+      - key: STALE_AFTER_DAYS
+        value: "2"

@@ -1,10 +1,13 @@
+# CI: lint + tests, the Vercel frontend build, and Docker smoke tests of the backend image
+# in both modes (local Chroma volume, and Render-like: remote Chroma + 512 MB limit).
+# Render deploys a main commit only after these checks pass (render.yaml:
+# autoDeployTrigger: checksPass).
+
 name: CI
 
 on:
   push:
-    branches-ignore: [main]  # on main, fly-deploy.yml runs this workflow before deploying
   pull_request:
-  workflow_call:
 
 permissions:
   contents: read
@@ -24,24 +27,44 @@ jobs:
           cache: pip
           cache-dependency-path: backend/pyproject.toml
       # CPU-only PyTorch first: the default Linux wheel bundles CUDA (several GB).
-      # Tests use ChromaDB + BM25 (rag) and the fetcher (ingest); the embedding model is
-      # faked in tests, so no model download is needed.
+      # The embedding model is faked in tests, so no model download is needed.
       - run: pip install --index-url https://download.pytorch.org/whl/cpu torch
       - run: pip install -e ".[dev,ingest,rag]"
       - run: ruff check .
       - run: pytest -q
 
-  docker:
-    name: Docker image smoke test
+  frontend:
+    name: Frontend build (Vercel)
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build as Vercel does
+        run: |
+          VERCEL_ENV=production API_BASE_URL=https://fund-facts-api.onrender.com sh build.sh
+          grep -q 'apiBase: "https://fund-facts-api.onrender.com"' dist/js/config.js
+          grep -q 'src="/js/config.js"' dist/index.html
+          test ! -e dist/build.sh && test ! -e dist/vercel.json
+      - name: Build fails without API_BASE_URL on Vercel
+        run: |
+          if VERCEL_ENV=production sh build.sh; then echo "::error::build must fail without API_BASE_URL"; exit 1; fi
+      - name: vercel.json is valid JSON
+        run: jq -e '.outputDirectory == "dist" and .buildCommand == "sh build.sh"' vercel.json
+
+  docker:
+    name: Docker image smoke tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
 
       - name: Build the image
         run: docker build -t fund-facts:ci .
 
-      - name: First start on an empty volume (builds the index)
+      # ------------------------------------------------ local mode (VECTOR_STORE=chroma)
+      - name: Local mode - first start on an empty volume builds the index
         run: |
           docker volume create ragdata
           docker run -d --name app -p 8080:8080 -v ragdata:/data \
@@ -53,29 +76,23 @@ jobs:
           cat health.json; echo
           jq -e '.status == "ok" and .index_loaded == true and .index_version != null' health.json
 
-      - name: UI, API and a chat round-trip (no LLM key needed for these replies)
+      - name: Local mode - UI, API and a chat round-trip
         run: |
           set -e
           curl -fsS http://localhost:8080/ | grep -q "Facts-only. No investment advice."
-          curl -fsS http://localhost:8080/js/app.js -o /dev/null
+          curl -fsS http://localhost:8080/js/config.js | grep -q 'apiBase: ""'
           curl -fsS http://localhost:8080/api/meta | jq -e '.schemes | length == 5'
           tid=$(curl -fsS -X POST http://localhost:8080/api/threads | jq -r .id)
           curl -fsS -X POST "http://localhost:8080/api/threads/$tid/messages" \
             -H 'Content-Type: application/json' -d '{"text":"Should I invest in HDFC Mid Cap?"}' \
-            | tee reply.json | jq -e '.message.kind == "refusal"'
+            | jq -e '.message.kind == "refusal"'
           curl -fsS -X POST "http://localhost:8080/api/threads/$tid/messages" \
             -H 'Content-Type: application/json' -d '{"text":"What is the capital of France?"}' \
             | jq -e '.message.kind == "not_found"'
           echo "$tid" > thread_id
-          # Admin endpoints need the token.
           test "$(curl -s -o /dev/null -w '%{http_code}' -X POST http://localhost:8080/api/admin/refresh)" = "401"
-          curl -fsS -H "Authorization: Bearer ci-admin-token" http://localhost:8080/api/admin/refresh | jq .
 
-      - name: Memory use
-        run: |
-          docker stats --no-stream --format "{{.Name}}: {{.MemUsage}} ({{.MemPerc}})" app | tee -a "$GITHUB_STEP_SUMMARY"
-
-      - name: Restart keeps chats and the index (persistent volume)
+      - name: Local mode - restart keeps chats and the index
         run: |
           set -e
           before=$(jq -r .index_version health.json)
@@ -85,12 +102,67 @@ jobs:
             sleep 3
           done
           jq -e --arg v "$before" '.index_version == $v' health2.json
-          tid=$(cat thread_id)
-          curl -fsS "http://localhost:8080/api/threads/$tid/messages" | jq -e 'length == 4'
-          if docker logs app 2>&1 | grep -c "no index in" | grep -qv '^1$'; then
-            echo "::error::the index was rebuilt on restart"; exit 1
-          fi
+          curl -fsS "http://localhost:8080/api/threads/$(cat thread_id)/messages" | jq -e 'length == 4'
+          docker rm -f app
+
+      # ------------------------------------------------ Render mode (Chroma Cloud stand-in)
+      - name: Render mode - Chroma server, API limited to 512 MB, starts degraded
+        run: |
+          docker network create rag
+          docker run -d --name chroma --network rag -p 8100:8000 --entrypoint chroma \
+            fund-facts:ci run --host 0.0.0.0 --port 8000 --path /chroma
+          for i in $(seq 1 30); do curl -fsS http://localhost:8100/api/v2/heartbeat && break; sleep 2; done
+          docker run -d --name api --network rag -p 8090:8080 --memory 512m --memory-swap 512m \
+            -e VECTOR_STORE=chroma_remote -e CHROMA_HOST=chroma -e CHROMA_PORT=8000 -e CHROMA_SSL=false \
+            -e INDEX_REFRESH_SECONDS=10 -e CORS_ORIGINS=https://fund-facts.vercel.app \
+            fund-facts:ci
+          for i in $(seq 1 40); do
+            if curl -fsS http://localhost:8090/api/health -o h0.json; then break; fi
+            sleep 3
+          done
+          cat h0.json; echo
+          jq -e '.status == "degraded" and .index_loaded == false' h0.json
+
+      - name: Render mode - daily refresh (as data-refresh.yml runs it) fills the Chroma server
+        run: |
+          docker run --rm --network rag \
+            -e VECTOR_STORE=chroma_remote -e CHROMA_HOST=chroma -e CHROMA_PORT=8000 -e CHROMA_SSL=false \
+            -e GITHUB_OUTPUT=/tmp/out --entrypoint sh fund-facts:ci -c '
+              set -e
+              cp /srv/seed/*.yaml /data/
+              python -m app.ingest --stage
+              v=$(grep "^version=" /tmp/out | tail -1 | cut -d= -f2)
+              python -m tests.eval.retrieval_eval --version "$v"
+              python -m app.ingest --activate "$v"
+              python -m app.ingest --status'
+
+      - name: Render mode - API heals itself, answers, CORS for Vercel, no OOM
+        run: |
+          set -e
+          for i in $(seq 1 30); do
+            curl -fsS http://localhost:8090/api/health -o h1.json || true
+            jq -e '.index_loaded == true' h1.json >/dev/null 2>&1 && break
+            sleep 3
+          done
+          cat h1.json; echo
+          jq -e '.status == "ok" and .index_loaded == true and .vector_store == "chroma_remote"' h1.json
+          tid=$(curl -fsS -X POST http://localhost:8090/api/threads | jq -r .id)
+          curl -fsS -X POST "http://localhost:8090/api/threads/$tid/messages" \
+            -H 'Content-Type: application/json' -d '{"text":"What is the capital of France?"}' \
+            | jq -e '.message.kind == "not_found"'
+          origin=$(curl -s -o /dev/null -D - -X OPTIONS http://localhost:8090/api/threads \
+            -H 'Origin: https://fund-facts.vercel.app' -H 'Access-Control-Request-Method: POST' \
+            | tr -d '\r' | awk -F': ' 'tolower($1)=="access-control-allow-origin"{print $2}')
+          test "$origin" = "https://fund-facts.vercel.app"
+          test "$(docker inspect api --format '{{.State.OOMKilled}} {{.State.Running}}')" = "false true"
+          mem=$(docker stats --no-stream --format '{{.MemUsage}} ({{.MemPerc}})' api)
+          echo "::notice title=Render-mode memory (512 MB limit)::api container uses $mem"
+          echo "Render-mode API memory: $mem" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Container logs
         if: always()
-        run: docker logs app 2>&1 | tail -150
+        run: |
+          for c in app api chroma; do
+            docker logs "$c" > "$c.log" 2>&1 || continue
+            echo "===== $c"; tail -80 "$c.log"
+          done

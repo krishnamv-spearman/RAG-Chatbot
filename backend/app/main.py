@@ -95,9 +95,12 @@ def create_app(settings: Settings | None = None, pipeline=None, pipeline_factory
                 logger.error("refresh unavailable", extra={"error": app.state.refresher_error})
         if not settings.llm_configured:
             logger.warning("LLM_API_KEY is not set: factual answers will be unavailable")
+        # Watch for new index versions, and keep retrying while degraded (e.g. a fresh
+        # deployment whose shared ChromaDB is still empty until the first refresh).
         watcher = None
-        if settings.index_refresh_seconds > 0 and \
-                getattr(app.state.pipeline, "index_source", None) is not None:
+        if settings.index_refresh_seconds > 0 and (
+                getattr(app.state.pipeline, "index_source", None) is not None
+                or (app.state.pipeline is None and app.state.pipeline_factory is not None)):
             watcher = asyncio.create_task(_watch_index(app, settings.index_refresh_seconds))
         yield
         if watcher:
@@ -114,12 +117,6 @@ def create_app(settings: Settings | None = None, pipeline=None, pipeline_factory
     app.state.locks: dict[str, asyncio.Lock] = {}
     app.state.client_limiter = ClientRateLimiter(settings.api_messages_per_minute)
 
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=settings.cors_origin_list,
-        allow_methods=["GET", "POST", "DELETE"],
-        allow_headers=["Content-Type"],
-    )
 
     @app.middleware("http")
     async def limit_body_size(request: Request, call_next):
@@ -314,6 +311,18 @@ def create_app(settings: Settings | None = None, pipeline=None, pipeline_factory
 
         app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="ui")
 
+    # CORS for the Vercel frontend. Registered LAST so it is the outermost middleware:
+    # every response, including 413/429/503 from the other middleware and handlers,
+    # carries the CORS headers, so the browser shows the real error.
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.cors_origin_list,
+        allow_origin_regex=settings.cors_origin_regex or None,
+        allow_methods=["GET", "POST", "DELETE"],
+        allow_headers=["Content-Type"],
+        expose_headers=["Retry-After"],
+        max_age=600,
+    )
     return app
 
 
@@ -369,6 +378,22 @@ def is_stale(corpus_date: str | None, max_age_days: int, today: date | None = No
     return (today or date.today()) - date.fromisoformat(corpus_date) > timedelta(days=max_age_days)
 
 
+def try_heal(app: FastAPI) -> bool:
+    """Degraded app: try to build the pipeline again (e.g. the first refresh has now
+    filled the shared ChromaDB). Returns True when the app is healthy again."""
+    if app.state.pipeline is not None or app.state.pipeline_factory is None:
+        return app.state.pipeline is not None
+    try:
+        app.state.pipeline = app.state.pipeline_factory()
+    except Exception as exc:  # noqa: BLE001 - still not ready; try again next time
+        app.state.pipeline_error = f"{type(exc).__name__}: {exc}"
+        return False
+    app.state.pipeline_error = None
+    logger.info("pipeline ready", extra={
+        "index_version": getattr(app.state.pipeline.retriever, "version", None)})
+    return True
+
+
 async def _watch_index(app: FastAPI, every_seconds: int) -> None:
     """Pick up index versions activated by the daily refresh, without a restart."""
     from app.pipeline import reload_if_changed
@@ -377,6 +402,7 @@ async def _watch_index(app: FastAPI, every_seconds: int) -> None:
         await asyncio.sleep(every_seconds)
         pipeline = app.state.pipeline
         if pipeline is None:
+            await run_in_threadpool(try_heal, app)
             continue
         try:
             version = await run_in_threadpool(reload_if_changed, pipeline)

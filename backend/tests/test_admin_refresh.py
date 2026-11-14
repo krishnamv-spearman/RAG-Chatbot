@@ -172,3 +172,27 @@ async def test_admin_endpoints_require_the_token(tmp_path):
         health = (await c.get("/api/health")).json()
         assert health["last_refresh"]["state"] == "running"
         assert "s3cret" not in json.dumps(health)
+
+
+# ---------------------------------------------------------------- degraded -> healthy
+
+
+def test_degraded_app_heals_when_the_index_appears(tmp_path):
+    from app.main import try_heal
+    from tests.test_api import make_pipeline
+
+    attempts = {"n": 0}
+
+    def factory():
+        attempts["n"] += 1
+        if attempts["n"] < 3:
+            raise RuntimeError("no index found; run `python -m app.ingest` first")
+        return make_pipeline()
+
+    app = create_app(Settings(_env_file=None, data_dir=tmp_path), pipeline_factory=factory)
+    app.state.pipeline_factory = factory
+    assert try_heal(app) is False and "no index" in app.state.pipeline_error
+    assert try_heal(app) is False
+    assert try_heal(app) is True and app.state.pipeline is not None
+    assert app.state.pipeline_error is None
+    assert try_heal(app) is True and attempts["n"] == 3  # no rebuild once healthy
