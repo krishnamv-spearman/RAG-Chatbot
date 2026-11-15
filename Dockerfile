@@ -1,51 +1,27 @@
-# Fund Facts backend: FastAPI API (+ the web UI, also served at / for local use).
-# Production: Render web service (render.yaml), vectors in Chroma Cloud
-# (VECTOR_STORE=chroma_remote), frontend on Vercel (frontend/vercel.json).
-#
-# Layout mirrors the repository (/srv/backend, /srv/frontend) because the app locates the
-# UI and the eval data relative to its own code. Local runtime data (chat database,
-# snapshots, and the Chroma index when VECTOR_STORE=chroma) lives in DATA_DIR=/data.
+﻿FROM python:3.11-slim
 
-FROM python:3.12-slim
-
-# OMP/MKL threads and MALLOC_ARENA_MAX keep PyTorch's memory small enough for 512 MB
-# instances (one request's embedding at a time doesn't need many threads).
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
+ENV PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    HF_HOME=/opt/hf-cache \
     TOKENIZERS_PARALLELISM=false \
-    OMP_NUM_THREADS=1 \
-    MKL_NUM_THREADS=1 \
-    MALLOC_ARENA_MAX=2 \
-    ANONYMIZED_TELEMETRY=False \
-    DATA_DIR=/data \
-    PORT=8080
+    HF_HOME=/app/.cache/huggingface
 
-WORKDIR /srv
+# Keep the repo layout (/app/backend, /app/data, /app/frontend):
+# config.py finds data/ and frontend/ two folders above backend/app/.
+WORKDIR /app/backend
 
-# 1) CPU-only PyTorch. The default Linux wheel bundles CUDA (several GB) that this
-#    CPU-only app never uses.
-RUN pip install --index-url https://download.pytorch.org/whl/cpu torch
+# CPU-only PyTorch first (the default wheel bundles CUDA and is several GB).
+COPY backend/requirements.txt .
+RUN pip install --index-url https://download.pytorch.org/whl/cpu torch \
+ && pip install -r requirements.txt
 
-# 2) Dependencies straight from pyproject.toml (core + ingest + rag): one source of truth.
-#    Copied on their own so this layer is cached while only code changes.
-COPY backend/pyproject.toml backend/pyproject.toml
-RUN python -c "import tomllib; p = tomllib.load(open('backend/pyproject.toml', 'rb'))['project']; o = p['optional-dependencies']; print('\n'.join(p['dependencies'] + o['ingest'] + o['rag']))" > /tmp/requirements.txt \
- && pip install -r /tmp/requirements.txt
-
-# 3) Bake the embedding model into the image: no download at start-up, works offline.
+# Download the embedding model at build time so startup doesn't have to.
 RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('BAAI/bge-small-en-v1.5')"
-ENV HF_HUB_OFFLINE=1
 
-# 4) Code, UI, registries (seeded into the volume at start) and the start-up script.
-COPY backend/ backend/
-COPY frontend/ frontend/
-COPY data/sources.yaml data/schemes.yaml data/refusal_links.yaml data/facts.json seed/
-COPY deploy/entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh && mkdir -p /data
+COPY backend/ /app/backend/
+COPY data/ /app/data/
+COPY frontend/ /app/frontend/
 
-WORKDIR /srv/backend
-EXPOSE 8080
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+# Render passes the port in $PORT (default 10000). Shell form so $PORT is expanded.
+# --forwarded-allow-ips trusts Render's proxy, so the per-user rate limit sees each
+# visitor's real IP instead of the proxy's (otherwise all visitors share one limit).
+CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-10000} --proxy-headers --forwarded-allow-ips="*"
